@@ -32,12 +32,27 @@ bool	check_port(char *arg) {
 	//maybe try to open port here 
 	return (true);
 }
+	
+bool	check_password(char* arg) {
+	std::string entered_password = static_cast<std::string>(arg);
+	std::string correct_password = "random password"; // Only for testing purposes
 
-bool	check_password(char *arg) {
-	std::string	password = static_cast<std::string>(arg);
-	// here need to compare entered password with true one
-	// maybe need to check if entered characters are allowed, in order to display specific message 
-	return (true);
+    // Check if entered characters are allowed (e.g., only alphanumeric characters)
+    std::regex allowed_chars("^[a-zA-Z0-9]*$");
+    if (!std::regex_match(entered_password, allowed_chars)) {
+        std::cout << YELLOW << "Password contains invalid characters." << END << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay for incorrect attempt
+        return (false);
+    }
+
+    // Compare the entered password with the true one
+    if (entered_password == correct_password) {
+        return (true);
+    } else {
+        std::cout << RED << "Incorrect password." << END << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay for incorrect attempt
+        return (false);
+    }
 }
 
 int	main(int ac, char **av) {
