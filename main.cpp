@@ -40,7 +40,7 @@ bool	check_password(char* arg) {
     // Check if entered characters are allowed (e.g., only alphanumeric characters)
     std::regex allowed_chars("^[a-zA-Z0-9]*$");
     if (!std::regex_match(entered_password, allowed_chars)) {
-        std::cout << YELLOW << "Password contains invalid characters." << END << std::endl;
+        std::cout << YELLOW << "Password contains invalid characters." << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay for incorrect attempt
         return (false);
     }
@@ -49,7 +49,7 @@ bool	check_password(char* arg) {
     if (entered_password == correct_password) {
         return (true);
     } else {
-        std::cout << RED << "Incorrect password." << END << std::endl;
+        std::cout << RED << "Incorrect password." << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay for incorrect attempt
         return (false);
     }
