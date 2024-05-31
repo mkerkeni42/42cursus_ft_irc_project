@@ -15,6 +15,8 @@
 #include <iostream>
 #include <cctype>
 #include <cstdlib>
+#include <unistd.h>
+#include <string>
 
 #define BOLD "\033[1m"
 #define UNDERLINE "\033[4m"
@@ -27,8 +29,3 @@
 #define ORANGE "\033[1;38;5;208m"
 #define LIGHT_CYAN "\033[1;36m"
 #define END "\033[0m"
-
-#define cout std::cout
-#define cin std::cin
-#define cerr std::cerr
-#define endl std::endl
