@@ -1,22 +1,9 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/05/31 09:56:11 by mkerkeni          #+#    #+#              #
-#    Updated: 2024/05/31 09:56:11 by mkerkeni         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = ircserv
 
 CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -pedantic -fsanitize=address -g3
 
-		
 SRC = 	main.cpp \
 
 OBJ = $(SRC:.cpp=.o)
