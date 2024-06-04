@@ -1,22 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Channel.cpp                                        :+:      :+:    :+:   */
+/*   ChannelServ.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ykifadji <ykifadji@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/03 16:12:23 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/03 16:14:33 by ykifadji         ###   ########.fr       */
+/*   Created: 2024/06/04 13:08:58 by ykifadji          #+#    #+#             */
+/*   Updated: 2024/06/04 14:51:06 by ykifadji         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Channel.cpp"
+#pragma once
 
-Channel::Channel() {}
+#include "../config.hpp"
+#include "Channel.hpp"
 
-Channel::~Channel() {}
+class ChannelServ {
 
-void	Channel::addUser(User& user) {
-	users.pushback(&user);
-	userMap[user.getNickName()] = &user;
-}
+public:
+	ChannelServ();
+	~ChannelServ();
+
+	void	joinChannel(const std::string& channelName, User* user);
+	void	leaveChannel(const std::string& channelName, User* user);
+	Channel*	getChannel(const std::string& channelName);
+
+private:
+	std::map<std::string, Channel> _channels;
+};

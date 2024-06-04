@@ -19,6 +19,12 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+//#include "User"
 
 #define BOLD "\033[1m"
 #define UNDERLINE "\033[4m"
