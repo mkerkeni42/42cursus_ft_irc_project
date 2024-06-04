@@ -16,6 +16,8 @@ UP = UP = \033[A
 #------------------------------------SRCS-------------------------------------#
 
 SRC = 	main.cpp \
+		./User/User.cpp \
+		./User/UserServ.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
