@@ -16,8 +16,12 @@ UP = UP = \033[A
 #------------------------------------SRCS-------------------------------------#
 
 SRC = 	main.cpp \
-		./User/User.cpp \
-		./User/UserServ.cpp \
+		User/User.cpp \
+		User/UserServ.cpp \
+		Channel/Channel.cpp \
+		Channel/ChannelServ.cpp \
+		NetworkServ.cpp \
+		MessageServ.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
