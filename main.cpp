@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "config.hpp"
+#include "User/User.hpp"
+#include "Messages/MessageServ.hpp"
 
 bool	check_port(char *arg) {
 	std::string	value = static_cast<std::string>(arg);
@@ -37,7 +39,6 @@ bool	check_password(char* arg) {
 	std::string	entered_password = arg;
 	std::string	correct_password = "randompassword"; // Only for testing purposes
 
-	// Check if entered characters are allowed (e.g., only alphanumeric characters)
 	for (size_t i = 0; i < entered_password.length(); ++i) {
 		if (!std::isalnum(entered_password[i])) {
 			std::cout << YELLOW << "Password contains invalid characters." << END << std::endl;
@@ -46,7 +47,6 @@ bool	check_password(char* arg) {
 		}
 	}
 
-	// Compare the entered password with the true one
 	if (entered_password == correct_password) {
 		return (true);
 	} else {
@@ -58,12 +58,20 @@ bool	check_password(char* arg) {
 
 int	main(int ac, char **av) {
 	if (ac != 3) {
-		std::cerr << RED << "ERROR: wrong number of arguments !" << std::endl;
+		std::cerr << RED << "Usage: " << av[0] << " <port> <password>" << std::endl;
 		return (1);
 	}
 	if (check_port(av[1]) == false)
 		return (1);
 	if (check_password(av[2]) == false)
 		return (1);
+	try {
+		UserServ		newUserServ("1234");
+		MessageServ	message(newUserServ);
+	}
+	catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return (1);
+	}
 	return (0);
 }

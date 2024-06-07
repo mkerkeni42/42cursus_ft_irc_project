@@ -13,16 +13,39 @@
 #pragma once
 
 #include "../config.hpp"
+#include "../User/User.hpp"
+#include "../User/UserServ.hpp"
 #include "../exceptions.hpp"
 
 class	MessageServ {
 
 public:
 
-	MessageServ(std::string const & message);
+	MessageServ(UserServ & userServ);
 	~MessageServ(void);
 
+	typedef void (MessageServ::*CommandHandler)(std::string & command, User & user);
+
+    void	handleCommand(std::string & command, User& user);
+
 private:
-	std::string	_message;
-	std::string	commands[12];
+
+	std::map<std::string, CommandHandler>	_command_map;     
+    UserServ&                               _userServ;
+    //ChannelServ&                            _channelServ;
+
+	void	handleUserCommand(std::string & command, User& user);
+    /*void	handleNickCommand(std::string & command, User& user);
+    void	handlePassCommand(std::string & command, User& user);
+    void	handleQuitCommand(std::string & command, User& user);
+    void	handleJoinCommand(std::string & command, User& user);
+    void	handlePartCommand(std::string & command, User& user);
+    void	handleInviteCommand(std::string & command, User& user);
+    void	handleKickCommand(std::string & command, User& user);
+    void	handleModeCommand(std::string & command, User& user);
+    void	handlePrivmsgCommand(std::string & command, User& user);
+    void	handlePingCommand(std::string & command, User& user);
+    void	handleCapCommand(std::string & command, User& user);*/
+
 };
+
