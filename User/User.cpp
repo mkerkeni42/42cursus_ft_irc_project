@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/09 16:49:59 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/09 23:32:16 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,10 @@ void	User::setPassword(std::string const & password) { this->_password = passwor
 void	User::setUsername(std::string const & username) { this->_username = username; }
 
 void	User::setNickname(std::string const & nickname, UserServ & userServ) {
+    if (getNickname().empty()) {
+       this->_nickname = nickname;
+       return;
+    }
     std::string    oldNickname = this->_nickname;
     this->_nickname = nickname;
     userServ.updateUserNicknameMap(oldNickname, nickname, this);

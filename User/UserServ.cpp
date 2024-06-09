@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/09 16:56:23 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/09 23:50:12 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int		UserServ::handleUserActivity(int fd) {
 	//if (user.receiveData() == -1)
 	//	return (-1);
 	//test here without socket
-	user.setBuffer("USER 4 5 8\r\n"); 
+	user.setBuffer("NICK momoE\r\n"); 
 	while (user.hasBufferedCommand()) {
 		std::string	command = user.getBufferedCommand();
 		_messageServ.handleCommand(command, user);
@@ -52,4 +52,13 @@ User	*UserServ::getUserByNickname(std::string const & nickname) {
 void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user) {
 	_nicknameMap.erase(oldNickname);
 	_nicknameMap[newNickname] = user;
+}
+
+bool UserServ::isUserRegistered(const std::string & username) {
+	std::map<int, User>::const_iterator it;
+	for ( it = _users.begin(); it != _users.end(); ++it) {
+    	if (it->second.getUsername() == username)
+        	return true;
+    }
+    return false;
 }

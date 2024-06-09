@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:57:42 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/09 16:33:35 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/09 23:18:36 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ public:
 	void	removeUser(int fd);
 	User	*getUserByNickname(std::string const & nickname);
 	void	updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user);
+	bool 	isUserRegistered(const std::string & username);
 
 private:
 	

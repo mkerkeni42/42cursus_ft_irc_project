@@ -36,9 +36,9 @@ private:
     //ChannelServ&                            _channelServ;
 
 	void	handleUserCommand(std::string & command, User& user);
-    /*void	handleNickCommand(std::string & command, User& user);
+    void	handleNickCommand(std::string & command, User& user);
     void	handlePassCommand(std::string & command, User& user);
-    void	handleQuitCommand(std::string & command, User& user);
+    /*void	handleQuitCommand(std::string & command, User& user);
     void	handleJoinCommand(std::string & command, User& user);
     void	handlePartCommand(std::string & command, User& user);
     void	handleInviteCommand(std::string & command, User& user);
