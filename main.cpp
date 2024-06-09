@@ -12,6 +12,7 @@
 
 #include "config.hpp"
 #include "User/User.hpp"
+#include "User/UserServ.hpp"
 #include "Messages/MessageServ.hpp"
 
 bool	check_port(char *arg) {
@@ -67,6 +68,8 @@ int	main(int ac, char **av) {
 		return (1);
 	try {
 		UserServ		newUserServ("1234");
+		newUserServ.addUser(3);
+		newUserServ.handleUserActivity(3);
 		MessageServ	message(newUserServ);
 	}
 	catch (const std::exception& e) {

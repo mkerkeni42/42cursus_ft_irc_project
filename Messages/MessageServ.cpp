@@ -12,6 +12,7 @@
 
 #include "MessageServ.hpp"
 #include "../User/UserServ.hpp"
+#include "../User/User.hpp"
 
 std::string	get_cmd(std::string message) {
 	size_t	pos = message.find(" ");
@@ -21,25 +22,24 @@ std::string	get_cmd(std::string message) {
 }
 
 MessageServ::MessageServ(UserServ & userServ) : _userServ(userServ) {
-	std::string	message = "USER mkerkeni 0 * :Myriam Kerkeni"; // just for testing
-	_command_map["USER"] = &MessageServ::handleUserCommand;
-	/*_command_map["NICK"] = &MessageServ::handleNickCommand;
-	_command_map["PASS"] = &MessageServ::handlePassCommand;
-	_command_map["QUIT"] = &MessageServ::handleQuitCommand;
-	_command_map["JOIN"] = &MessageServ::handleJoinCommand;
-	_command_map["PART"] = &MessageServ::handlePartCommand;
-	_command_map["INVITE"] = &MessageServ::handleInviteCommand;
-	_command_map["KICK"] = &MessageServ::handleKickCommand;
-	_command_map["MODE"] = &MessageServ::handleModeCommand;
-	_command_map["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
-	_command_map["PING"] = &MessageServ::handlePingCommand;
-	_command_map["CAP"] = &MessageServ::handleCapCommand;*/
+	_commandMap["USER"] = &MessageServ::handleUserCommand;
+	/*_commandMap["NICK"] = &MessageServ::handleNickCommand;
+	_commandMap["PASS"] = &MessageServ::handlePassCommand;
+	_commandMap["QUIT"] = &MessageServ::handleQuitCommand;
+	_commandMap["JOIN"] = &MessageServ::handleJoinCommand;
+	_commandMap["PART"] = &MessageServ::handlePartCommand;
+	_commandMap["INVITE"] = &MessageServ::handleInviteCommand;
+	_commandMap["KICK"] = &MessageServ::handleKickCommand;
+	_commandMap["MODE"] = &MessageServ::handleModeCommand;
+	_commandMap["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
+	_commandMap["PING"] = &MessageServ::handlePingCommand;
+	_commandMap["CAP"] = &MessageServ::handleCapCommand;*/
 }
 
 void	MessageServ::handleCommand(std::string & command, User& user) {
 	std::string	cmd = get_cmd(command);
-	std::map<std::string, CommandHandler>::iterator it = _command_map.find(cmd);
-    if (it != _command_map.end())
+	std::map<std::string, CommandHandler>::iterator it = _commandMap.find(cmd);
+    if (it != _commandMap.end())
     	(this->*(it->second))(command, user);
     else
     	throw UnknownCommandException(cmd);

@@ -6,13 +6,14 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/08 00:06:05 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/09 16:56:23 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "UserServ.hpp"
+#include "User.hpp"
 
-UserServ::UserServ(std::string const & password) : _password(password) {}
+UserServ::UserServ(std::string const & password) : _password(password),  _messageServ(*this) {}
 
 UserServ::~UserServ(void) {}
 
@@ -23,11 +24,13 @@ void	UserServ::addUser(int fd) {
 
 int		UserServ::handleUserActivity(int fd) {
 	User	&user = _users[fd];
-	if (user.receiveData() == -1)
-		return (-1);
+	//if (user.receiveData() == -1)
+	//	return (-1);
+	//test here without socket
+	user.setBuffer("USER 4 5 8\r\n"); 
 	while (user.hasBufferedCommand()) {
 		std::string	command = user.getBufferedCommand();
-		//messageServ.handleCommand(command, user);
+		_messageServ.handleCommand(command, user);
 	}
 	return (0);
 }
@@ -46,8 +49,7 @@ User	*UserServ::getUserByNickname(std::string const & nickname) {
     return NULL;
 }
 
-void	User::setNickname(std::string const & nickname) {
-	_nicknameMap.erase(nickname);
-    nickname = nick;
-    _nicknameMap[nick] = this;
+void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user) {
+	_nicknameMap.erase(oldNickname);
+	_nicknameMap[newNickname] = user;
 }

@@ -6,11 +6,14 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/07 23:26:56 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/09 16:49:59 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "User.hpp"
+#include "UserServ.hpp"
+
+User::User(void) {}
 
 User::User(int fd) : _fd(fd) {}
 
@@ -30,7 +33,12 @@ void	User::setPassword(std::string const & password) { this->_password = passwor
 
 void	User::setUsername(std::string const & username) { this->_username = username; }
 
-void	User::setNickname(std::string const & nickname) { this->_nickname = nickname; }
+void	User::setNickname(std::string const & nickname, UserServ & userServ) {
+    std::string    oldNickname = this->_nickname;
+    this->_nickname = nickname;
+    userServ.updateUserNicknameMap(oldNickname, nickname, this);
+    
+}
 
 void	User::setRole(std::string const & role) { this->_role = role; }
 
@@ -38,7 +46,7 @@ int User::receiveData() {
     char buf[512];
     int bytesRead = recv(_fd, buf, sizeof(buf), 0);
     if (bytesRead <= 0) {
-        return -1; // Indicate that the user should be removed
+        return -1;
     }
     _buffer.append(buf, bytesRead);
     return 0;

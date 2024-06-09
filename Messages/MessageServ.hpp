@@ -13,9 +13,10 @@
 #pragma once
 
 #include "../config.hpp"
-#include "../User/User.hpp"
-#include "../User/UserServ.hpp"
 #include "../exceptions.hpp"
+
+class   UserServ;
+class   User;
 
 class	MessageServ {
 
@@ -30,7 +31,7 @@ public:
 
 private:
 
-	std::map<std::string, CommandHandler>	_command_map;     
+	std::map<std::string, CommandHandler>	_commandMap;     
     UserServ&                               _userServ;
     //ChannelServ&                            _channelServ;
 
