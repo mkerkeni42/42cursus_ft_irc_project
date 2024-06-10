@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:06 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/09 16:54:18 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/10 14:48:28 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 class	UserServ;
 
-class User {
+class	User {
 
 public:
 
@@ -30,11 +30,11 @@ public:
 	std::string	getPassword(void) const;
 	std::string	getUsername(void) const;
 	std::string	getNickname(void) const;
-	std::string	getRole(void) const;
+	int			getMode(void) const;
 	
 	void		setUsername(std::string const & username);
 	void		setNickname(std::string const & nickname, UserServ & userServ);
-	void		setRole(std::string const & role);
+	void		setMode(int const & mode);
 	void		setPassword(std::string const & password);
 	// just for testing
 	void		setBuffer(std::string const & command) { _buffer = command; }
@@ -50,5 +50,5 @@ private:
 	std::string	_buffer;
 	std::string	_username;
 	std::string	_nickname;
-	std::string	_role;
+	int			_mode;
 };

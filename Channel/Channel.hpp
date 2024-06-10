@@ -3,18 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ykifadji <ykifadji@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 15:10:44 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/04 14:52:22 by ykifadji         ###   ########.fr       */
+/*   Updated: 2024/06/10 14:47:53 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "../config.hpp"
+#include "../exceptions.hpp"
 
-class Channel {
+class	User;
+
+class	Channel {
 
 public:
 	Channel();

@@ -6,14 +6,14 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/09 23:50:12 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/10 15:39:22 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "UserServ.hpp"
 #include "User.hpp"
 
-UserServ::UserServ(std::string const & password) : _password(password),  _messageServ(*this) {}
+UserServ::UserServ(std::string const & password) : _password(password), _messageServ(*this, _channelServ), _channelServ() {}
 
 UserServ::~UserServ(void) {}
 
@@ -27,7 +27,7 @@ int		UserServ::handleUserActivity(int fd) {
 	//if (user.receiveData() == -1)
 	//	return (-1);
 	//test here without socket
-	user.setBuffer("NICK momoE\r\n"); 
+	user.setBuffer("JOIN #coucou\r\n"); 
 	while (user.hasBufferedCommand()) {
 		std::string	command = user.getBufferedCommand();
 		_messageServ.handleCommand(command, user);
@@ -54,10 +54,23 @@ void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::strin
 	_nicknameMap[newNickname] = user;
 }
 
+void	UserServ::addUserByNickname(std::string const & nickname, User* user) {
+	_nicknameMap[nickname] = user;
+}
+
 bool UserServ::isUserRegistered(const std::string & username) {
 	std::map<int, User>::const_iterator it;
 	for ( it = _users.begin(); it != _users.end(); ++it) {
     	if (it->second.getUsername() == username)
+        	return true;
+    }
+    return false;
+}
+
+bool 	UserServ::isNicknameInUse(const std::string & nickname) {
+	std::map<std::string, User*>::iterator it;
+	for ( it = _nicknameMap.begin(); it != _nicknameMap.end(); ++it) {
+    	if (it->first == nickname)
         	return true;
     }
     return false;

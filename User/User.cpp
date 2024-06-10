@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/09 23:32:16 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/10 13:30:37 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ std::string	User::getUsername(void) const { return (this->_username); }
 
 std::string	User::getNickname(void) const { return (this->_nickname); }
 
-std::string	User::getRole(void) const { return (this->_role); }
+int	User::getMode(void) const { return (this->_mode); }
 
 void	User::setPassword(std::string const & password) { this->_password = password; }
 
@@ -36,6 +36,7 @@ void	User::setUsername(std::string const & username) { this->_username = usernam
 void	User::setNickname(std::string const & nickname, UserServ & userServ) {
     if (getNickname().empty()) {
        this->_nickname = nickname;
+       userServ.addUserByNickname(nickname, this);
        return;
     }
     std::string    oldNickname = this->_nickname;
@@ -44,7 +45,7 @@ void	User::setNickname(std::string const & nickname, UserServ & userServ) {
     
 }
 
-void	User::setRole(std::string const & role) { this->_role = role; }
+void	User::setMode(int const & mode) { this->_mode = mode; }
 
 int User::receiveData() {
     char buf[512];

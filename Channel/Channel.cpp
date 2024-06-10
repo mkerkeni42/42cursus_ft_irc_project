@@ -3,27 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ykifadji <ykifadji@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 16:12:23 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/04 14:47:32 by ykifadji         ###   ########.fr       */
+/*   Updated: 2024/06/10 14:45:44 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
+#include "../User/User.hpp"
 
 Channel::Channel() {}
 
 Channel::~Channel() {}
 
-void	Channel::addUser(User& user) {
+void	Channel::addUser(User & user) {
 	_users.push_back(&user);
-	_userMap[user.getNickName()] = &user;
+	_userMap[user.getNickname()] = &user;
 }
 
 void	Channel::removeUser(User& user) {
 	_users.erase(std::remove(_users.begin(), _users.end(), &user), _users.end());
-	_userMap.erase(user.getNickName());
+	_userMap.erase(user.getNickname());
 }
 
 void	Channel::broadcastMessage(const std::string& message, User& sender) {

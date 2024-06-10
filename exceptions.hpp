@@ -18,11 +18,11 @@ class	NoSuchNickException : public std::exception {
 public:
 	NoSuchNickException(const std::string& nick) : _nick(nick) {
 		std::ostringstream	message;
-		message << "401 ERR_NOSUCHNICKNAME " << _nick << " No such nick/channel";
+		message << ERR_NOSUCHNICKNAME << " " << _nick << " :No such nick/channel";
 		_message = message.str();
 	}
 	virtual	~NoSuchNickException() throw () {}
-	virtual const char* what() const throw() { 
+	virtual const char* what() const throw () { 
 		return (_message.c_str());
 	}
 private:
@@ -34,11 +34,11 @@ class	NoSuchChannelException : public std::exception {
 public:
 	NoSuchChannelException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "403 ERR_NOSUCHCHANNEL " << _channel << " No such channel";
+		message << ERR_NOSUCHCHANNEL << " " << _channel << " :No such channel";
 		_message = message.str();
 	}
 	virtual	~NoSuchChannelException() throw () {}
-	virtual const char* what() const throw() { 
+	virtual const char* what() const throw () { 
 		return (_message.c_str());
 	}
 private:
@@ -50,11 +50,11 @@ class	CannotSendToChanException : public std::exception {
 public:
 	CannotSendToChanException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "404 ERR_CANNOTSENDTOCHAN " << _channel << " Cannot send to channel";
+		message << ERR_CANNOTSENDTOCHAN << " " << _channel << " :Cannot send to channel";
 		_message = message.str();
 	}
 	virtual	~CannotSendToChanException() throw () {}
-	virtual const char* what() const throw() { 
+	virtual const char* what() const throw () { 
 		return (_message.c_str());
 	}
 private:
@@ -66,11 +66,11 @@ class	TooManyChannelsException : public std::exception {
 public:
 	TooManyChannelsException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "405 ERR_TOOMANYCHANNELS " << _channel << " You have joined too many channels";
+		message << ERR_TOOMANYCHANNELS << " " << _channel << " :You have joined too many channels";
 		_message = message.str();
 	}
 	virtual ~TooManyChannelsException() throw () {}
-	virtual const char* what() const throw() { 
+	virtual const char* what() const throw () { 
 		return (_message.c_str());
 	}
 private:
@@ -78,22 +78,30 @@ private:
 	std::string	_message;
 };
 
-class	NoOriginSpecifiedException : public std::exception {
+class	NoOriginException : public std::exception {
 public:
-	virtual const char* what() const throw() {
-		return ("409 ERR_NOORIGIN No origin specified");
+	NoOriginException() {
+		std::ostringstream	message;
+		message << ERR_NOORIGIN << "No origin specified";
+		_message = message.str();
 	}
+	virtual ~NoOriginException() throw () {}
+	virtual const char* what() const throw () {
+		return (_message.c_str());
+	}
+private:
+	std::string	_message;
 };
 
 class	NoRecipientException : public std::exception {
 public:
 	NoRecipientException(const std::string& command) : _command(command) {
 		std::ostringstream	message;
-		message << "411 ERR_NORECIPIENT No recipient given (" << _command << ")";
+		message << ERR_NORECIPIENT << " " << ":No recipient given (" << _command << ")";
 	_message = message.str();
 	}
 	virtual	~NoRecipientException() throw () {}
-	virtual const char* what() const throw() { 
+	virtual const char* what() const throw () { 
 		return (_message.c_str());
 	}
 private:
@@ -103,16 +111,24 @@ private:
 
 class	NoTextToSendException : public std::exception {
 public:
-	virtual const char* what() const throw() { 
-		return ("412 ERR_NOTEXTTOSEND No text to send");
+	NoTextToSendException() {
+		std::ostringstream	message;
+		message << ERR_NOTEXTTOSEND << " :No text to send";
+		_message = message.str();
 	}
+	virtual ~NoTextToSendException() throw () {}
+	virtual const char* what() const throw () {
+		return (_message.c_str());
+	}
+private:
+	std::string	_message;
 };
 
 class	UnknownCommandException : public std::exception {
 public:
 	UnknownCommandException(const std::string& command) : _command(command) {
 		std::ostringstream	message;
-		message << "421 ERR_UNKNOWNCOMMAND " << _command << " Unknown command";
+		message << ERR_UNKNOWNCOMMAND << " " << _command << " :Unknown command";
 		_message = message.str();
 	}
 	virtual ~UnknownCommandException() throw () {}
@@ -126,16 +142,24 @@ private:
 
 class	NoNicknameGivenException : public std::exception {
 public:
-	virtual const char* what() const throw() { 
-		return ("431 ERR_NONICKNAMEGIVEN No nickname given");
+	NoNicknameGivenException() {
+		std::ostringstream	message;
+		message << ERR_NONICKNAMEGIVEN << " :No nickname given";
+		_message = message.str();
 	}
+	virtual ~NoNicknameGivenException() throw () {}
+	virtual const char* what() const throw () {
+		return (_message.c_str());
+	}
+private:
+	std::string	_message;
 };
 
 class	ErroneusNicknameException : public std::exception {
 public:
 	ErroneusNicknameException(const std::string& nick) : _nick(nick) {
 		std::ostringstream	message;
-		message << "432 ERR_ERRONEUSNICKNAME " << _nick << " Erroneus nickname";
+		message << ERR_ERRONEUSNICKNAME <<  " " << _nick << " :Erroneus nickname";
 		_message = message.str();
 	}
 	virtual ~ErroneusNicknameException() throw () {}
@@ -151,7 +175,7 @@ class	NicknameInUseException : public std::exception {
 public:
 	NicknameInUseException(const std::string& nick) : _nick(nick) {
 		std::ostringstream	message;
-		message << "433 ERR_NICKNAMEINUSE " << _nick << " Nickname is already in use";
+		message << ERR_NICKNAMEINUSE << " " << _nick << " :Nickname is already in use";
 		_message = message.str();
 	}
 	virtual ~NicknameInUseException() throw () {}
@@ -167,7 +191,7 @@ class	UserNotInChannelException : public std::exception {
 public:
 	UserNotInChannelException(const std::string& nick, const std::string& channel) : _nick(nick), _channel(channel) {
 		std::ostringstream	message;
-		message << "441 ERR_USERNOTINCHANNEL " << _nick << " " << _channel << " They aren't on that channel";
+		message << ERR_USERNOTINCHANNEL << " " << _nick << " " << _channel << " :They aren't on that channel";
 		_message = message.str();
 	}
 	virtual ~UserNotInChannelException() throw () {}
@@ -184,7 +208,7 @@ class	NotOnChannelException : public std::exception {
 public:
 	NotOnChannelException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "442 ERR_NOTONCHANNEL " << _channel << " You are not on that channel";
+		message << ERR_NOTONCHANNEL << " " << _channel << " :You are not on that channel";
 		_message = message.str();
 	}
 	virtual ~NotOnChannelException() throw () {}
@@ -200,7 +224,7 @@ class	UserOnChannelException : public std::exception {
 public:
 	UserOnChannelException(const std::string& user, const std::string& channel) : _user(user), _channel(channel) {
 		std::ostringstream	message;
-		message << "443 ERR_USERONCHANNEL " << _user << " " << _channel << " is already on channel";
+		message << ERR_USERONCHANNEL << " " << _user << " " << _channel << " :Is already on channel";
 		_message = message.str();
 	}
 	virtual ~UserOnChannelException() throw () {}
@@ -215,23 +239,39 @@ private:
 
 class	NotRegisteredException : public std::exception {
 public:
-	virtual const char* what() const throw() { 
-		return ("451 ERR_NOTREGISTERED You have not registered");
+	NotRegisteredException() {
+		std::ostringstream	message;
+		message << ERR_NOTREGISTERED << " :You have not registered";
+		_message = message.str();
 	}
+	virtual ~NotRegisteredException() throw () {}
+	virtual const char* what() const throw () {
+		return (_message.c_str());
+	}
+private:
+	std::string	_message;
 };
 
 class	AlreadyRegisteredException : public std::exception {
 public:
-	virtual const char* what() const throw() { 
-		return ("462 ERR_ALREADYREGISTERED You may not reregister");
+	AlreadyRegisteredException() {
+		std::ostringstream	message;
+		message << ERR_ALREADYREGISTERED << " :You may not reregister";
+		_message = message.str();
 	}
+	virtual ~AlreadyRegisteredException() throw () {}
+	virtual const char* what() const throw () {
+		return (_message.c_str());
+	}
+private:
+	std::string	_message;
 };
 
 class	NeedMoreParamsException : public std::exception {
 public:
 	NeedMoreParamsException(const std::string& command) : _command(command) {
 		std::ostringstream	message;
-		message << "461 ERR_NEEDMOREPARAMS " << _command << " NotEnoughParameters";
+		message << ERR_NEEDMOREPARAMS << " " << _command << " :NotEnoughParameters";
 		_message = message.str();
 	}
 	virtual ~NeedMoreParamsException() throw() {}
@@ -245,16 +285,24 @@ private:
 
 class	PasswdMismatchException : public std::exception {
 public:
-	virtual const char* what() const throw() { 
-		return ("464 ERR_PASSWDMISMATCH Password incorrect");
+	PasswdMismatchException() {
+		std::ostringstream	message;
+		message << ERR_PASSWDMISMATCH << " :Password incorrect";
+		_message = message.str();
 	}
+	virtual ~PasswdMismatchException() throw() {}
+	virtual const char* what() const throw() { 
+		return (_message.c_str());
+	}
+private:
+	std::string	_message;
 };
 
 class	KeySetException : public std::exception {
 public:
 	KeySetException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "467 ERR_KEYSET " << _channel << " Channel key already set";
+		message << ERR_KEYSET << " " << _channel << " :Channel key already set";
 		_message = message.str();
 	}
 	virtual ~KeySetException() throw () {}
@@ -270,7 +318,7 @@ class	ChannelIsFullException : public std::exception {
 public:
 	ChannelIsFullException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "471 ERR_CHANNELISFULL " << _channel << " Cannot join channel (+l)";
+		message << ERR_CHANNELISFULL << " " << _channel << " :Cannot join channel (+l)";
 		_message = message.str();
 	}
 	virtual ~ChannelIsFullException() throw() {}
@@ -286,7 +334,7 @@ class	UnknownModeException : public std::exception {
 public:
 	UnknownModeException(const std::string& param) : _param(param) {
 		std::ostringstream	message;
-		message << "472 ERR_UNKNOWNMODE " << _param << " Is unknown mode char to me";
+		message << ERR_UNKNOWNMODE << " " << _param << " :Is unknown mode char to me";
 		_message = message.str();
 	}
 	virtual ~UnknownModeException() throw () {}
@@ -302,7 +350,7 @@ class	InviteOnlyChanException : public std::exception {
 public:
 	InviteOnlyChanException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "473 ERR_INVITEONLYCHAN " << _channel << " Cannot join channel (+i)";
+		message << ERR_INVITEONLYCHAN << " " << _channel << " :Cannot join channel (+i)";
 		_message = message.str();
 	}
 	virtual ~InviteOnlyChanException() throw () {}
@@ -318,7 +366,7 @@ class	BannedFromChanException : public std::exception {
 public:
 	BannedFromChanException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "474 ERR_BANNEDFROMCHAN " << _channel << " Cannot join channel (+b)";
+		message << ERR_BANNEDFROMCHAN << " " << _channel << " :Cannot join channel (+b)";
 		_message = message.str();
 	}
 	virtual ~BannedFromChanException() throw () {}
@@ -334,7 +382,7 @@ class	BadChannelKeyException : public std::exception {
 public:
 	BadChannelKeyException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "475 ERR_BADCHANNELKEY " << _channel << " Cannot join channel (+k)";
+		message << ERR_BADCHANNELKEY << " " << _channel << " :Cannot join channel (+k)";
 		_message = message.str();
 	}
 	virtual ~BadChannelKeyException() throw () {}
@@ -350,7 +398,7 @@ class	ChanOPrivsNeededException : public std::exception {
 public:
 	ChanOPrivsNeededException(const std::string& channel) : _channel(channel) {
 		std::ostringstream	message;
-		message << "471 ERR_CHANOPRIVSNEEDED " << _channel << " You're not channel operator";
+		message << ERR_CHANOPRIVSNEEDED << " " << _channel << " :You're not channel operator";
 		_message = message.str();
 	}
 	virtual ~ChanOPrivsNeededException() throw () {}

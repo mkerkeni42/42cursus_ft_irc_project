@@ -17,12 +17,13 @@
 
 class   UserServ;
 class   User;
+class   ChannelServ;
 
 class	MessageServ {
 
 public:
 
-	MessageServ(UserServ & userServ);
+	MessageServ(UserServ & userServ, ChannelServ & channelServ);
 	~MessageServ(void);
 
 	typedef void (MessageServ::*CommandHandler)(std::string & command, User & user);
@@ -33,20 +34,21 @@ private:
 
 	std::map<std::string, CommandHandler>	_commandMap;     
     UserServ&                               _userServ;
-    //ChannelServ&                            _channelServ;
+    ChannelServ&                            _channelServ;
 
-	void	handleUserCommand(std::string & command, User& user);
-    void	handleNickCommand(std::string & command, User& user);
-    void	handlePassCommand(std::string & command, User& user);
-    /*void	handleQuitCommand(std::string & command, User& user);
-    void	handleJoinCommand(std::string & command, User& user);
-    void	handlePartCommand(std::string & command, User& user);
-    void	handleInviteCommand(std::string & command, User& user);
-    void	handleKickCommand(std::string & command, User& user);
-    void	handleModeCommand(std::string & command, User& user);
-    void	handlePrivmsgCommand(std::string & command, User& user);
-    void	handlePingCommand(std::string & command, User& user);
-    void	handleCapCommand(std::string & command, User& user);*/
+	void	handleUserCommand(std::string & command, User & user);
+    void	handleNickCommand(std::string & command, User & user);
+    void	handlePassCommand(std::string & command, User & user);
+    void	handleQuitCommand(std::string & command, User & user);
+    void	handleJoinCommand(std::string & command, User & user);
+    /*void	handlePartCommand(std::string & command, User & user);
+    void	handleInviteCommand(std::string & command, User & user);
+    void	handleKickCommand(std::string & command, User & user);
+    void	handleTopicCommand(std::string & command, User & user);
+    void	handleModeCommand(std::string & command, User & user);
+    void	handlePrivmsgCommand(std::string & command, User & user);
+    void	handlePingCommand(std::string & command, User & user);
+    void	handleCapCommand(std::string & command, User & user);*/
 
 };
 

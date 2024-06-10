@@ -19,9 +19,9 @@ SRC = 	main.cpp \
 		Messages/MessageServ.cpp \
 		User/User.cpp \
 		User/UserServ.cpp \
-		#Channel/Channel.cpp \
+		Channel/Channel.cpp \
 		Channel/ChannelServ.cpp \
-		NetworkServ.cpp
+		#NetworkServ.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
