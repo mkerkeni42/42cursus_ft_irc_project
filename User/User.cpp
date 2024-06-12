@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/10 13:30:37 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:29:47 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 User::User(void) {}
 
-User::User(int fd) : _fd(fd) {}
+User::User(int fd) : _fd(fd), _joinedChanNb(0) {}
 
 User::~User(void) {}
 
@@ -28,6 +28,8 @@ std::string	User::getUsername(void) const { return (this->_username); }
 std::string	User::getNickname(void) const { return (this->_nickname); }
 
 int	User::getMode(void) const { return (this->_mode); }
+
+int	User::getJoinedChanNb(void) const { return (this->_joinedChanNb); }
 
 void	User::setPassword(std::string const & password) { this->_password = password; }
 
@@ -46,6 +48,8 @@ void	User::setNickname(std::string const & nickname, UserServ & userServ) {
 }
 
 void	User::setMode(int const & mode) { this->_mode = mode; }
+
+void    User::incJoinedChanNb(void) { this->_joinedChanNb++; }
 
 int User::receiveData() {
     char buf[512];

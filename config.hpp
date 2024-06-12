@@ -68,3 +68,9 @@
 #define STD_USER 0
 #define INVISIBLE_USER 8
 #define OPERATOR 10
+
+#define MAX_CHANNELS_PER_USER 10
+
+#define	PUBLIC 0
+#define INVITE_ONLY 1
+#define PROTECTED 2

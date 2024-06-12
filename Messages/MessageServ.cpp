@@ -116,18 +116,33 @@ void	MessageServ::handleQuitCommand(std::string & command, User & user) {
 void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	std::cout << "Handling JOIN command" << std::endl;
 	std::istringstream iss(command);
-    std::string cmd, channel;
-    iss >> cmd >> channel >> std::ws;
+    std::string cmd, channel, arg;
+
+    iss >> cmd >> channel >> arg >> std::ws;
 	if (channel.empty() || channel[0] != '#')
 		throw (NeedMoreParamsException(cmd));
+	if (user.getJoinedChanNb() == MAX_CHANNELS_PER_USER)
+		throw (TooManyChannelsException(channel));
+	if (_channelServ.DoesChannelExist(channel) == false) {
+		//create channel here with name
+		_channelServ.getChannel(channel)->setMode(PUBLIC);
+		user.incJoinedChanNb();
+		return;
+	}
 	if (_channelServ.isUserOnChannel(channel, user) == true)
 		throw (UserOnChannelException(user.getUsername(), channel));
-	// need to check if channelServ is full ERR_CHANNELISFULL
-	//need to check if user has reached max number of channel joined ERR_TOOMAYCHANNELS
-	//need to check channel mode and user mode ERR_CHNOPRIVNEEDED
-	//if channel already exists, join
-	//if channel doesn't exists, create it
-
+	if (_channelServ.isChannelFull(channel) == true)
+		throw (ChannelIsFullException(channel));
+	if (_channelServ.getChannel(channel)->getMode() == INVITE_ONLY)
+		throw (InviteOnlyChanException(channel));
+	if (_channelServ.getChannel(channel)->getMode() == PROTECTED && (arg.empty()
+		|| _channelServ.getChannel(channel)->getPassword().compare(arg))) {
+			throw (BadChannelKeyException(channel));
+	}
+	_channelServ.getChannel(channel)->addUser(user);
+	user.incJoinedChanNb();
+	//need to set mode for users regarding channels (channel operator or standard user)
+	//is channel creator the channel operator ?
 }
 
 /*void	MessageServ::handlePartCommand(std::string & command, User & user) {

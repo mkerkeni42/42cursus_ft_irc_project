@@ -6,14 +6,14 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 16:12:23 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/10 14:45:44 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:38:08 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 #include "../User/User.hpp"
 
-Channel::Channel() {}
+Channel::Channel() : _maxUsersPerChannel(0) {}
 
 Channel::~Channel() {}
 
@@ -42,8 +42,18 @@ User*	Channel::getUserByNickname(const std::string& nickname) {
 	return NULL;
 }
 
-void	Channel::setTopic(const std::string& newTopic) {_topic = newTopic;}
+void	Channel::setTopic(const std::string& newTopic) { _topic = newTopic; }
 
-void	Channel::setMode(const std::string& newMode) {_mode = newMode;}
+void	Channel::setMode(const int & newMode) { _mode = newMode; }
 
-const std::vector<User*>&	Channel::getUsers() const {return _users;}
+void	Channel::setPassword(std::string & newPassword) { _password = newPassword; }
+
+void	Channel::setMaxUsersPerChannel(size_t nb) { _maxUsersPerChannel = nb; }
+
+const std::vector<User*>&	Channel::getUsers() const { return _users; }
+
+size_t	Channel::getMaxUsersPerChannel(void) const { return (_maxUsersPerChannel); }
+
+int	Channel::getMode(void) const { return (_mode); }
+
+std::string	Channel::getPassword(void) const { return (_password); }
