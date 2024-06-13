@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/10 15:39:22 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/13 15:03:25 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int		UserServ::handleUserActivity(int fd) {
 	//if (user.receiveData() == -1)
 	//	return (-1);
 	//test here without socket
-	user.setBuffer("JOIN #coucou\r\n"); 
+	user.setBuffer("TOPIC #chan hello world\r\n"); 
 	while (user.hasBufferedCommand()) {
 		std::string	command = user.getBufferedCommand();
 		_messageServ.handleCommand(command, user);

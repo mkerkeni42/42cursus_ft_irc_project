@@ -271,7 +271,7 @@ class	NeedMoreParamsException : public std::exception {
 public:
 	NeedMoreParamsException(const std::string& command) : _command(command) {
 		std::ostringstream	message;
-		message << ERR_NEEDMOREPARAMS << " " << _command << " :NotEnoughParameters";
+		message << ERR_NEEDMOREPARAMS << " " << _command << " :Not enough parameters";
 		_message = message.str();
 	}
 	virtual ~NeedMoreParamsException() throw() {}

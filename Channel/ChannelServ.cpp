@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 13:39:32 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/12 22:21:49 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/13 14:22:53 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ bool	ChannelServ::isUserOnChannel(std::string const & channelName, User & user) 
 	return (false);
 }
 
-bool		ChannelServ::isChannelFull(std::string const & channelName) {
+bool	ChannelServ::isChannelFull(std::string const & channelName) {
 	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
 	
 	Channel channel = it->second;
@@ -59,4 +59,37 @@ bool		ChannelServ::isChannelFull(std::string const & channelName) {
 	if (channel.getMaxUsersPerChannel() != 0 && users.size() == channel.getMaxUsersPerChannel())
 		return (true);
 	return (false);	
+}
+
+bool	ChannelServ::isUserBanned(std::string const & channelName, User & user) {
+	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
+	Channel channel = it->second;
+	std::vector<std::string> bannedUsers = channel.getBannedUsers();
+	std::vector<std::string>::iterator	vecIt;
+	for (vecIt = bannedUsers.begin(); vecIt != bannedUsers.end(); ++vecIt) {
+		if (*vecIt == user.getUsername())
+			return (true);
+	}
+	return (false);
+}
+
+bool	ChannelServ::isUserInvited(std::string const & channelName, User & user) {
+	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
+	Channel channel = it->second;
+	std::vector<std::string> invitedUsers = channel.getInvitedUsers();
+	std::vector<std::string>::iterator	vecIt;
+	for (vecIt = invitedUsers.begin(); vecIt != invitedUsers.end(); ++vecIt) {
+		if (*vecIt == user.getUsername())
+			return (true);
+	}
+	return (false);
+}
+
+void	ChannelServ::createChannel(const std::string & channelName, User & user) {
+	Channel	newChannel;
+	
+	newChannel.setName(channelName);
+	newChannel.addUser(user);
+	newChannel.setOperator(user.getUsername());
+	_channels[channelName] = newChannel;
 }

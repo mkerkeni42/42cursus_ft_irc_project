@@ -32,12 +32,12 @@ MessageServ::MessageServ(UserServ & userServ, ChannelServ & channelServ) : _user
 	_commandMap["PASS"] = &MessageServ::handlePassCommand;
 	_commandMap["QUIT"] = &MessageServ::handleQuitCommand;
 	_commandMap["JOIN"] = &MessageServ::handleJoinCommand;
-	/*_commandMap["PART"] = &MessageServ::handlePartCommand;
+	_commandMap["PART"] = &MessageServ::handlePartCommand;
 	_commandMap["INVITE"] = &MessageServ::handleInviteCommand;
 	_commandMap["KICK"] = &MessageServ::handleKickCommand;
 	_commandMap["TOPIC"] = &MessageServ::handleTopicCommand;
 	_commandMap["MODE"] = &MessageServ::handleModeCommand;
-	_commandMap["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
+	/*_commandMap["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
 	_commandMap["PING"] = &MessageServ::handlePingCommand;
 	_commandMap["CAP"] = &MessageServ::handleCapCommand;*/
 }
@@ -73,7 +73,7 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 		if (!std::isdigit(mode[i]))
 			return; //don't no if need to display error
 	}
-	if (mode.compare("0") && mode.compare("8") && mode.compare("10"))
+	if (mode != "0" && mode != "8" && mode != "10")
 		return; //don't no if need to display error
 	user.setMode(std::atoi(mode.c_str()));
 	user.setUsername(username);
@@ -121,51 +121,201 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
     iss >> cmd >> channel >> arg >> std::ws;
 	if (channel.empty() || channel[0] != '#')
 		throw (NeedMoreParamsException(cmd));
+	channel = channel.substr(1);
 	if (user.getJoinedChanNb() == MAX_CHANNELS_PER_USER)
 		throw (TooManyChannelsException(channel));
 	if (_channelServ.DoesChannelExist(channel) == false) {
-		//create channel here with name
+		_channelServ.createChannel(channel, user);
 		_channelServ.getChannel(channel)->setMode(PUBLIC);
 		user.incJoinedChanNb();
 		return;
 	}
-	if (_channelServ.isUserOnChannel(channel, user) == true)
-		throw (UserOnChannelException(user.getUsername(), channel));
+	if (_channelServ.isUserOnChannel(channel, user) == true) {
+		//open channel window
+		return;
+	}
 	if (_channelServ.isChannelFull(channel) == true)
 		throw (ChannelIsFullException(channel));
-	if (_channelServ.getChannel(channel)->getMode() == INVITE_ONLY)
-		throw (InviteOnlyChanException(channel));
+	if (_channelServ.getChannel(channel)->getMode() == INVITE_ONLY \
+		&& _channelServ.isUserInvited(channel, user) == false)
+			throw (InviteOnlyChanException(channel));
 	if (_channelServ.getChannel(channel)->getMode() == PROTECTED && (arg.empty()
-		|| _channelServ.getChannel(channel)->getPassword().compare(arg))) {
+		|| _channelServ.getChannel(channel)->getPassword() != arg)) {
 			throw (BadChannelKeyException(channel));
 	}
-	_channelServ.getChannel(channel)->addUser(user);
+	if (_channelServ.isUserBanned(channel, user) == true)
+		throw (BannedFromChanException(channel));
+	_channelServ.joinChannel(channel, user);
 	user.incJoinedChanNb();
-	//need to set mode for users regarding channels (channel operator or standard user)
-	//is channel creator the channel operator ?
+	//need to display message on channel to inform other users that someone has joined the channel
 }
 
-/*void	MessageServ::handlePartCommand(std::string & command, User & user) {
+void	MessageServ::handlePartCommand(std::string & command, User & user) {
 	std::cout << "Handling PART command" << std::endl;
+	std::istringstream iss(command);
+    std::string cmd, channel;
+
+    iss >> cmd >> channel >> std::ws;
+	channel = channel.substr(1);
+	// if we are out of chanel window
+	if (channel.empty() || channel[0] != '#')
+		throw (NeedMoreParamsException(cmd));
+	if (_channelServ.isUserOnChannel(channel, user) == false)
+		throw (NotOnChannelException(channel));
+	_channelServ.leaveChannel(channel, user);
+	user.decJoinedChanNb();
+	//need to find a way to detect if we are inside channel window or not
 }
 
 void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	std::cout << "Handling INVITE command" << std::endl;
+	std::istringstream iss(command);
+    std::string cmd, channel, nickname;
+
+    iss >> cmd >> channel >> nickname >> std::ws;
+	if (channel.empty() || channel[0] != '#' || nickname.empty())
+		throw (NeedMoreParamsException(cmd));
+	channel = channel.substr(1);
+	if (_channelServ.DoesChannelExist(channel) == false)
+		throw (NoSuchChannelException(channel));
+	if (_channelServ.isUserOnChannel(channel, user) == false)
+		throw (NotOnChannelException(channel));
+	Channel	*channelObj = _channelServ.getChannel(channel);
+	if (channelObj->getOperator() != user.getUsername())
+		throw (ChanOPrivsNeededException(channel));
+	if (_userServ.isNicknameInUse(nickname) == false)
+		throw (NoSuchNickException(nickname));
+	User	*guest = _userServ.getUserByNickname(nickname);
+	if (_channelServ.isUserOnChannel(channel, *guest) == true)
+		throw (UserOnChannelException((*guest).getUsername(), channel));
+	if (_channelServ.isUserBanned(channel, *guest) == true)
+		throw (BannedFromChanException(channel));
+	channelObj->setInvitedUsers((*guest).getUsername());
+	//need to send invitation message to guest here (with PRIVMSG ?)
 }
 
 void	MessageServ::handleKickCommand(std::string & command, User & user) {
 	std::cout << "Handling KICK command" << std::endl;
+	std::istringstream iss(command);
+    std::string cmd, channel, nickname, message;
+
+    iss >> cmd >> channel >> std::ws;
+	std::getline(iss, message);
+	if (channel.empty() || channel[0] != '#' || nickname.empty())
+		throw (NeedMoreParamsException(cmd));
+	channel = channel.substr(1);
+	if (_channelServ.DoesChannelExist(channel) == false)
+		throw (NoSuchChannelException(channel));
+	if (_channelServ.isUserOnChannel(channel, user) == false)
+		throw (NotOnChannelException(channel));
+	Channel	*channelObj = _channelServ.getChannel(channel);
+	if (channelObj->getOperator() != user.getUsername())
+		throw (ChanOPrivsNeededException(channel));
+	if (_userServ.isNicknameInUse(nickname) == false)
+		throw (NoSuchNickException(nickname));
+	User	*troublemaker = _userServ.getUserByNickname(nickname);
+	if (_channelServ.isUserOnChannel(channel, *troublemaker) == false)
+		throw (UserNotInChannelException((*troublemaker).getUsername(), channel));
+	_channelServ.leaveChannel(channel, *troublemaker);
+	channelObj->setBannedUsers(troublemaker->getUsername());
+	// need to display message in channel to inform troublemaker has been banned
 }
 
 void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	std::cout << "Handling TOPIC command" << std::endl;
+	std::istringstream iss(command);
+    std::string cmd, channel, message;
+
+    iss >> cmd >> channel >> std::ws;
+	std::getline(iss, message);
+	if (channel.empty() || channel[0] != '#')
+		throw (NeedMoreParamsException(cmd));
+	channel = channel.substr(1);
+	if (_channelServ.DoesChannelExist(channel) == false)
+		throw (NoSuchChannelException(channel));
+	if (_channelServ.isUserOnChannel(channel, user) == false)
+		throw (NotOnChannelException(channel));
+	Channel	*channelObj = _channelServ.getChannel(channel);
+	if (/*mode is +t &&*/ channelObj->getOperator() != user.getUsername())
+		throw (ChanOPrivsNeededException(channel));
+	// here, need to display messages below on channel window
+	if (message.empty())
+		std::cout << "Topic for #" << channel << ": " << channelObj->getTopic() << std::endl;
+	else {
+		channelObj->setTopic(message);
+		std::cout << user.getUsername() << " changed the topic of #" << channel << " to " << message << std::endl;
+	}
 }
 
 void	MessageServ::handleModeCommand(std::string & command, User & user) {
 	std::cout << "Handling MODE command" << std::endl;
+	std::istringstream iss(command);
+    std::string cmd, channel, mode, arg;
+
+    iss >> cmd >> channel >> mode >> arg >> std::ws;
+	if (channel.empty() || channel[0] != '#' || mode.empty())
+		throw (NeedMoreParamsException(cmd));
+	channel = channel.substr(1);
+	if (_channelServ.DoesChannelExist(channel) == false)
+		throw (NoSuchChannelException(channel));
+	if (_channelServ.isUserOnChannel(channel, user) == false)
+		throw (NotOnChannelException(channel));
+	Channel	*channelObj = _channelServ.getChannel(channel);
+	if (channelObj->getOperator() != user.getUsername())
+		throw (ChanOPrivsNeededException(channel));
+	if (mode.length() != 2 || (mode[1] != 'i' && mode[1] != 't' \
+		&& mode[1] != 'k' && mode[1] != 'o' && mode[1] != 'l'))
+			throw (UnknownModeException(mode));
+	if (mode[0] == '+')
+		handleSetMode(channelObj, mode[1], arg);
+	else if (mode[0] == '-')
+		handleRemoveMode(channelObj, mode[1], arg);
 }
 
-void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
+void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string arg) {
+	switch (mode) {
+		case 'i':
+			channel->setMode(INVITE_ONLY);
+			break;
+		case 't':
+
+			break;
+		case 'k':
+			break;
+		case 'o':
+			break;
+		case 'l':
+			for (int i = 0; i < arg.length(); i++) {
+				if (std::isdigit(arg[i]) == false)
+					return;
+			}
+			channel->setMaxUsersPerChannel(std::atoi(arg.c_str()));
+			break;
+		default:
+			break;
+	}
+}
+
+void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::string arg) {
+	switch (mode) {
+		case 'i':
+		channel->setMode(PUBLIC);
+			break;
+		case 't':
+			break;
+		case 'k':
+			break;
+		case 'o':
+			break;
+		case 'l':
+			channel->setMaxUsersPerChannel(0);
+			break;
+		default:
+			break;
+	}
+}
+
+/*void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 	std::cout << "Handling PRIVMSG command" << std::endl;
 }
 

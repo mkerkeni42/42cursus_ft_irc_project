@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:06 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/12 22:28:57 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/13 11:29:04 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ public:
 	void		setMode(int const & mode);
 	void		setPassword(std::string const & password);
 	void		incJoinedChanNb();
+	void		decJoinedChanNb();
 	// just for testing
 	void		setBuffer(std::string const & command) { _buffer = command; }
 	

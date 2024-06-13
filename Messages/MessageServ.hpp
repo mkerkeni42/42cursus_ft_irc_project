@@ -41,14 +41,14 @@ private:
     void	handlePassCommand(std::string & command, User & user);
     void	handleQuitCommand(std::string & command, User & user);
     void	handleJoinCommand(std::string & command, User & user);
-    /*void	handlePartCommand(std::string & command, User & user);
+    void	handlePartCommand(std::string & command, User & user);
     void	handleInviteCommand(std::string & command, User & user);
     void	handleKickCommand(std::string & command, User & user);
     void	handleTopicCommand(std::string & command, User & user);
-    void	handleModeCommand(std::string & command, User & user);
-    void	handlePrivmsgCommand(std::string & command, User & user);
+    void    handleModeCommand(std::string & command, User & user);
+    void    handleSetMode(Channel *channel, char const & mode, std::string arg);
+    void    handleRemoveMode(Channel *channel, char const & mode, std::string arg);
+    /*void	handlePrivmsgCommand(std::string & command, User & user);
     void	handlePingCommand(std::string & command, User & user);
     void	handleCapCommand(std::string & command, User & user);*/
-
 };
-
