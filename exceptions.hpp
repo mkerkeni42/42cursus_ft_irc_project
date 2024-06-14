@@ -46,22 +46,6 @@ private:
 	std::string	_message;
 };
 
-class	CannotSendToChanException : public std::exception {
-public:
-	CannotSendToChanException(const std::string& channel) : _channel(channel) {
-		std::ostringstream	message;
-		message << ERR_CANNOTSENDTOCHAN << " " << _channel << " :Cannot send to channel";
-		_message = message.str();
-	}
-	virtual	~CannotSendToChanException() throw () {}
-	virtual const char* what() const throw () { 
-		return (_message.c_str());
-	}
-private:
-	std::string	_channel;
-	std::string	_message;
-};
-
 class	TooManyChannelsException : public std::exception {
 public:
 	TooManyChannelsException(const std::string& channel) : _channel(channel) {

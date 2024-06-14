@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/13 11:30:05 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/14 14:42:16 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ User::User(int fd) : _fd(fd), _joinedChanNb(0) {}
 
 User::~User(void) {}
 
-std::string	User::getPassword(void) const { return (this->_password); }
-
 int	User::getFD(void) const { return (this->_fd); }
+
+std::string	User::getPassword(void) const { return (this->_password); }
 
 std::string	User::getUsername(void) const { return (this->_username); }
 

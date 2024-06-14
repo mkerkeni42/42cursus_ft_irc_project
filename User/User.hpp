@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:06 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/13 11:29:04 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/14 14:41:07 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,15 @@ public:
 	int			getMode(void) const;
 	int			getJoinedChanNb(void) const;
 	
+	void		setPassword(std::string const & password);
 	void		setUsername(std::string const & username);
 	void		setNickname(std::string const & nickname, UserServ & userServ);
 	void		setMode(int const & mode);
-	void		setPassword(std::string const & password);
+	// just for testing purpose
+	void		setBuffer(std::string const & command) { _buffer = command; }
+	
 	void		incJoinedChanNb();
 	void		decJoinedChanNb();
-	// just for testing
-	void		setBuffer(std::string const & command) { _buffer = command; }
 	
 	int			receiveData();
     bool		hasBufferedCommand() const;

@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/13 15:03:25 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/14 14:50:08 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,23 +22,27 @@ void	UserServ::addUser(int fd) {
 	this->_users[fd] = newUser;
 }
 
-int		UserServ::handleUserActivity(int fd) {
-	User	&user = _users[fd];
-	//if (user.receiveData() == -1)
-	//	return (-1);
-	//test here without socket
-	user.setBuffer("TOPIC #chan hello world\r\n"); 
-	while (user.hasBufferedCommand()) {
-		std::string	command = user.getBufferedCommand();
-		_messageServ.handleCommand(command, user);
-	}
-	return (0);
+void	UserServ::addUserByNickname(std::string const & nickname, User* user) {
+	_nicknameMap[nickname] = user;
 }
 
 void	UserServ::removeUser(int fd) {
 	User	&user = this->_users[fd];
 	_nicknameMap.erase(user.getNickname());
 	this->_users.erase(fd);
+}
+
+int		UserServ::handleUserActivity(int fd) {
+	User	&user = _users[fd];
+	//if (user.receiveData() == -1)
+	//	return (-1);
+	//test here without socket
+	user.setBuffer("PRIVMSG #chan coucou\r\n"); 
+	while (user.hasBufferedCommand()) {
+		std::string	command = user.getBufferedCommand();
+		_messageServ.handleCommand(command, user);
+	}
+	return (0);
 }
 
 User	*UserServ::getUserByNickname(std::string const & nickname) {
@@ -54,9 +58,6 @@ void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::strin
 	_nicknameMap[newNickname] = user;
 }
 
-void	UserServ::addUserByNickname(std::string const & nickname, User* user) {
-	_nicknameMap[nickname] = user;
-}
 
 bool UserServ::isUserRegistered(const std::string & username) {
 	std::map<int, User>::const_iterator it;

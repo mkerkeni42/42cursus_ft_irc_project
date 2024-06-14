@@ -41,11 +41,10 @@
 
 #define ERR_NOSUCHNICKNAME 401
 #define ERR_NOSUCHCHANNEL 403
-#define ERR_CANNOTSENDTOCHAN 404 //PRIVMSG
 #define ERR_TOOMANYCHANNELS 405
 #define ERR_NOORIGIN 409 //PING
-#define ERR_NORECIPIENT 411 // PRIVMSG
-#define ERR_NOTEXTTOSEND 412 // PRIVMSG
+#define ERR_NORECIPIENT 411 // PONG
+#define ERR_NOTEXTTOSEND 412
 #define ERR_UNKNOWNCOMMAND 421
 #define ERR_NONICKNAMEGIVEN 431
 #define ERR_ERRONEUSNICKNAME 432
@@ -59,18 +58,27 @@
 #define ERR_PASSWDMISMATCH 464
 #define ERR_KEYSET 467
 #define ERR_CHANNELISFULL 471
-#define ERR_UNKNOWNMODE 472 // MODE
+#define ERR_UNKNOWNMODE 472
 #define ERR_INVITEONLYCHAN 473
 #define ERR_BANNEDFROMCHAN 474
 #define ERR_BADCHANNELKEY 475
 #define ERR_CHANOPRIVSNEEDED 471
 
+// 3 Macros below for server mode, don't know if we have to handle it or not,
+// subject isn't clear, it didn't mention that we need to handle OPER command
 #define STD_USER 0
 #define INVISIBLE_USER 8
 #define OPERATOR 10
 
 #define MAX_CHANNELS_PER_USER 10
 
+//Macros for channel mode
 #define	PUBLIC 0
 #define INVITE_ONLY 1
-#define PROTECTED 2
+#define PROTECTED 2 // if access protected by password
+
+#define CHANOP_ONLY 3 // mode +t mode for topic, if only chanop can change it
+
+//Macros for channel password
+#define DISABLED 0 // mode -k
+#define ENABLED 1 // mode +k

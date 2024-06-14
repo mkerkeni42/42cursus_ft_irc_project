@@ -14,6 +14,7 @@
 
 #include "../config.hpp"
 #include "../exceptions.hpp"
+#include "../Channel/Channel.hpp"
 
 class   UserServ;
 class   User;
@@ -48,7 +49,6 @@ private:
     void    handleModeCommand(std::string & command, User & user);
     void    handleSetMode(Channel *channel, char const & mode, std::string arg);
     void    handleRemoveMode(Channel *channel, char const & mode, std::string arg);
-    /*void	handlePrivmsgCommand(std::string & command, User & user);
-    void	handlePingCommand(std::string & command, User & user);
-    void	handleCapCommand(std::string & command, User & user);*/
+    void	handlePrivmsgCommand(std::string & command, User & user);
+    //void	handlePingCommand(std::string & command, User & user);
 };
