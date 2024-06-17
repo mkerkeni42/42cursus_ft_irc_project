@@ -62,6 +62,7 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::getline(iss, realname);
 	if (username.empty() || mode.empty() || unused.empty() || realname.empty())
 		throw (NeedMoreParamsException(cmd));
+	// set max size for username (64 ?)
 	for (size_t i = 0; i < username.length(); i++) {
 		if (!std::isalnum(username[i]) || username[i] != '_' || username[i] != '-')
 			return;
@@ -70,10 +71,10 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 		throw (AlreadyRegisteredException());
 	for (size_t i = 0; i < mode.length(); i++) {
 		if (!std::isdigit(mode[i]))
-			return; //don't no if need to display error
+			return;
 	}
 	if (mode != "0" && mode != "8" && mode != "10")
-		return; //don't no if need to display error
+		return;
 	user.setMode(std::atoi(mode.c_str()));
 	user.setUsername(username);
 }
@@ -103,7 +104,7 @@ void	MessageServ::handlePassCommand(std::string & command, User & user) {
 	std::istringstream iss(command);
     std::string cmd, password;
     iss >> cmd >> password >> std::ws;
-	// need to decide password policy
+	// need to decide password policy: between 8 and 24 characters
     user.setPassword(password);
 }
 
@@ -117,7 +118,7 @@ void	MessageServ::handleQuitCommand(std::string & command, User & user) {
 void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	std::cout << "Handling JOIN command" << std::endl;
 	std::istringstream iss(command);
-    std::string cmd, channel, arg;
+    std::string cmd, channel, arg; // rename arg --> passwd
 
     iss >> cmd >> channel >> arg >> std::ws;
 	if (channel.empty() || channel[0] != '#')
@@ -143,11 +144,10 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 		|| _channelServ.getChannel(channel)->getPassword() != arg)) {
 			throw (BadChannelKeyException(channel));
 	}
-	if (_channelServ.isUserBanned(channel, user) == true)
+	if (_channelServ.isUserBanned(channel, user) == true) // need to be deleted
 		throw (BannedFromChanException(channel));
 	_channelServ.joinChannel(channel, user);
 	user.incJoinedChanNb();
-	//need to display message on channel to inform other users that someone has joined the channel
 }
 
 void	MessageServ::handlePartCommand(std::string & command, User & user) {
@@ -156,10 +156,10 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
     std::string cmd, channel;
 
     iss >> cmd >> channel >> std::ws;
-	channel = channel.substr(1);
 	// if we are out of chanel window
 	if (channel.empty() || channel[0] != '#')
 		throw (NeedMoreParamsException(cmd));
+	channel = channel.substr(1);
 	if (_channelServ.isUserOnChannel(channel, user) == false)
 		throw (NotOnChannelException(channel));
 	_channelServ.leaveChannel(channel, user);
@@ -188,7 +188,7 @@ void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	User	*guest = _userServ.getUserByNickname(nickname);
 	if (_channelServ.isUserOnChannel(channel, *guest) == true)
 		throw (UserOnChannelException((*guest).getUsername(), channel));
-	if (_channelServ.isUserBanned(channel, *guest) == true)
+	if (_channelServ.isUserBanned(channel, *guest) == true) // need to delete it
 		throw (BannedFromChanException(channel));
 	channelObj->setInvitedUsers((*guest).getUsername());
 	//need to send invitation message to guest here (with PRIVMSG ?)
@@ -217,14 +217,12 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 	if (_channelServ.isUserOnChannel(channel, *troublemaker) == false)
 		throw (UserNotInChannelException((*troublemaker).getUsername(), channel));
 	_channelServ.leaveChannel(channel, *troublemaker);
-	channelObj->setBannedUsers(troublemaker->getUsername());
-	// need to display message in channel to inform troublemaker has been banned
 }
 
 void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	std::cout << "Handling TOPIC command" << std::endl;
 	std::istringstream iss(command);
-    std::string cmd, channel, message;
+    std::string cmd, channel, message; //rename topic
 
     iss >> cmd >> channel >> std::ws;
 	std::getline(iss, message);
@@ -238,12 +236,11 @@ void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	Channel	*channelObj = _channelServ.getChannel(channel);
 	if (channelObj->getTopicMode() == CHANOP_ONLY && channelObj->isOperator(user.getUsername()) == false)
 		throw (ChanOPrivsNeededException(channel));
-	// here, need to display messages below on channel window
 	if (message.empty())
 		std::cout << "Topic for #" << channel << ": " << channelObj->getTopic() << std::endl;
 	else {
 		channelObj->setTopic(message);
-		std::cout << user.getUsername() << " changed the topic of #" << channel << " to " << message << std::endl;
+		//std::cout << user.getUsername() << " changed the topic of #" << channel << " to " << message << std::endl;
 	}
 }
 
@@ -283,6 +280,7 @@ void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string
 			if (channel->getPasswordMode() == ENABLED)
 				throw (KeySetException(channel->getName()));
 			channel->setPasswordMode(ENABLED);
+			//needto set password here
 			channel->setMode(PROTECTED);
 			break;
 		case 'o': {
@@ -314,6 +312,7 @@ void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::str
 		case 'k':
 			channel->setPasswordMode(DISABLED);
 			channel->setMode(PUBLIC);
+			//need to delete password, try to put NULL
 			break;
 		case 'o': {
 			User *user = _userServ.getUserByNickname(arg);

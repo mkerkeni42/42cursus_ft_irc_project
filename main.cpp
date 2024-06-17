@@ -70,7 +70,6 @@ int	main(int ac, char **av) {
 		UserServ		newUserServ("1234");
 		newUserServ.addUser(3);
 		newUserServ.handleUserActivity(3);
-		//MessageServ	message(newUserServ);
 	}
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;

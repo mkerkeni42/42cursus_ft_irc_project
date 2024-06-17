@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/14 14:50:08 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/17 10:01:45 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	UserServ::removeUser(int fd) {
 
 int		UserServ::handleUserActivity(int fd) {
 	User	&user = _users[fd];
-	//if (user.receiveData() == -1)
+	if (user.receiveData() == -1)
 	//	return (-1);
 	//test here without socket
 	user.setBuffer("PRIVMSG #chan coucou\r\n"); 

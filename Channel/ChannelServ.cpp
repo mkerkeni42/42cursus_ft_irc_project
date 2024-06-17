@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 13:39:32 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/14 11:56:31 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/17 12:15:58 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	ChannelServ::leaveChannel(const std::string& channelName, User & user) {
 void	ChannelServ::createChannel(const std::string & channelName, User & user) {
 	Channel	newChannel;
 	
+	// need to ask for a fd
 	newChannel.setName(channelName);
 	newChannel.addUser(user);
 	newChannel.addOperator(user.getUsername());
