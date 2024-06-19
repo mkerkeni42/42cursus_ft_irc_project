@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/17 10:01:45 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/19 22:00:12 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,7 @@ void	UserServ::removeUser(int fd) {
 int		UserServ::handleUserActivity(int fd) {
 	User	&user = _users[fd];
 	if (user.receiveData() == -1)
-	//	return (-1);
-	//test here without socket
-	user.setBuffer("PRIVMSG #chan coucou\r\n"); 
+		return (-1);
 	while (user.hasBufferedCommand()) {
 		std::string	command = user.getBufferedCommand();
 		_messageServ.handleCommand(command, user);
@@ -45,12 +43,17 @@ int		UserServ::handleUserActivity(int fd) {
 	return (0);
 }
 
+void	UserServ::broadcastPrivateMessage(const std::string& message, std::string& recipient) {
+	User	*user = getUserByNickname(recipient);
+	send(user->getFD(), message.c_str(), message.size(), 0);
+}
+
 User	*UserServ::getUserByNickname(std::string const & nickname) {
 	std::map<std::string, User*>::iterator it = _nicknameMap.find(nickname);
     if (it != _nicknameMap.end()) {
         return it->second;
     }
-    return NULL;
+    return (NULL);
 }
 
 void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user) {

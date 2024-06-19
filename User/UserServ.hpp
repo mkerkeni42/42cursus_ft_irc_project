@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:57:42 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/14 14:50:04 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/19 22:01:01 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,10 @@ public:
 	
 	void	addUser(int fd);
 	void	addUserByNickname(std::string const & nickname, User* user);
-	void	removeUser(int fd); // not used, maybe we can delete it
+	void	removeUser(int fd);
 	
 	int		handleUserActivity(int fd);
+	void	broadcastPrivateMessage(const std::string& message, std::string& recipient);
 	
 	User	*getUserByNickname(std::string const & nickname);
 	void	updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user);

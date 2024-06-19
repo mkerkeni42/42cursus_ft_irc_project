@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:06 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/14 14:41:07 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/19 21:56:02 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,14 @@ public:
 	void		setUsername(std::string const & username);
 	void		setNickname(std::string const & nickname, UserServ & userServ);
 	void		setMode(int const & mode);
-	// just for testing purpose
-	void		setBuffer(std::string const & command) { _buffer = command; }
 	
-	void		incJoinedChanNb();
-	void		decJoinedChanNb();
+	void		incJoinedChanNb(void);
+	void		decJoinedChanNb(void);
 	
 	int			receiveData();
     bool		hasBufferedCommand() const;
     std::string	getBufferedCommand();
+	void		broadcastMessageToHimself(const std::string& message);
 	
 private:
 

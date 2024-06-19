@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 16:12:23 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/14 11:39:26 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/19 22:14:51 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,37 @@ void	Channel::removeUser(User& user) {
 	_userMap.erase(user.getNickname());
 }
 
-void	Channel::broadcastMessage(const std::string& message, User& sender) {
-	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
-		User*	user = *it;
-		if (user != &sender)
-			send(user->getFD(), message.c_str(), message.size(), 0);
-	}
-}
+void	Channel::setName(const std::string& name) { _name = name; }
+
+void	Channel::setTopic(const std::string& newTopic) { _topic = newTopic; }
+
+void	Channel::setPassword(std::string & newPassword) { _password = newPassword; }
+
+void	Channel::setMode(const int & newMode) { _mode = newMode; }
+
+void	Channel::setTopicMode(const int & newMode) { _topicMode = newMode; }
+
+void	Channel::setPasswordMode(const int & newMode) { _passwordMode = newMode; }
+
+void	Channel::setMaxUsersPerChannel(size_t nb) { _maxUsersPerChannel = nb; }
+
+void	Channel::setInvitedUsers(const std::string& username) { _invitedUsers.push_back(username); }
+
+std::string	Channel::getName(void) const { return (_name); }
+
+std::string	Channel::getTopic(void) const { return (_topic); }
+
+std::string	Channel::getPassword(void) const { return (_password); }
+
+int	Channel::getMode(void) const { return (_mode); }
+
+int	Channel::getTopicMode(void) const { return (_topicMode); }
+
+int	Channel::getPasswordMode(void) const { return (_passwordMode); }
+
+size_t	Channel::getMaxUsersPerChannel(void) const { return (_maxUsersPerChannel); }
+
+std::vector<std::string>	Channel::getInvitedUsers(void) const { return (_invitedUsers); }	
 
 User*	Channel::getUserByNickname(const std::string& nickname) {
 	std::map<std::string, User*>::iterator	it = _userMap.find(nickname);
@@ -42,19 +66,7 @@ User*	Channel::getUserByNickname(const std::string& nickname) {
 	return NULL;
 }
 
-void	Channel::setTopic(const std::string& newTopic) { _topic = newTopic; }
-
-void	Channel::setMode(const int & newMode) { _mode = newMode; }
-
-void	Channel::setPasswordMode(const int & newMode) { _passwordMode = newMode; }
-
-void	Channel::setTopicMode(const int & newMode) { _topicMode = newMode; }
-
-void	Channel::setPassword(std::string & newPassword) { _password = newPassword; }
-
-void	Channel::setMaxUsersPerChannel(size_t nb) { _maxUsersPerChannel = nb; }
-
-void	Channel::setName(const std::string& name) { _name = name; }
+const std::vector<User*>&	Channel::getUsers() const { return _users; }
 
 void	Channel::addOperator(const std::string& username) { _operators.push_back(username); }
 
@@ -64,26 +76,6 @@ void	Channel::removeOperator(const std::string& username) {
 		_operators.erase(it);
 }
 
-void	Channel::setBannedUsers(const std::string& username) { _bannedUsers.push_back(username); }
-
-void	Channel::setInvitedUsers(const std::string& username) { _invitedUsers.push_back(username); }
-
-const std::vector<User*>&	Channel::getUsers() const { return _users; }
-
-size_t	Channel::getMaxUsersPerChannel(void) const { return (_maxUsersPerChannel); }
-
-int	Channel::getMode(void) const { return (_mode); }
-
-int	Channel::getPasswordMode(void) const { return (_passwordMode); }
-
-int	Channel::getTopicMode(void) const { return (_topicMode); }
-
-std::string	Channel::getPassword(void) const { return (_password); }
-
-std::string	Channel::getTopic(void) const { return (_topic); }
-
-std::string	Channel::getName(void) const { return (_name); }
-
 bool	Channel::isOperator(std::string const & username) const {
 	std::vector<std::string>::const_iterator it = std::find(_operators.begin(), _operators.end(), username);
 	if (it != _operators.end())
@@ -91,6 +83,9 @@ bool	Channel::isOperator(std::string const & username) const {
 	return (false);
 }
 
-std::vector<std::string>	Channel::getBannedUsers(void) const { return (_bannedUsers); }
-
-std::vector<std::string>	Channel::getInvitedUsers(void) const { return (_invitedUsers); }	
+void	Channel::broadcastMessageOnChannel(const std::string& message) {
+	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
+		User*	user = *it;
+		send(user->getFD(), message.c_str(), message.size(), 0);
+	}
+}

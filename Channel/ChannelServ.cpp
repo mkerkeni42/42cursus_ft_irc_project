@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 13:39:32 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/17 12:15:58 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/19 22:16:07 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,27 @@ void	ChannelServ::leaveChannel(const std::string& channelName, User & user) {
 void	ChannelServ::createChannel(const std::string & channelName, User & user) {
 	Channel	newChannel;
 	
-	// need to ask for a fd
 	newChannel.setName(channelName);
 	newChannel.addUser(user);
 	newChannel.addOperator(user.getUsername());
 	_channels[channelName] = newChannel;
+}
+
+void		ChannelServ::removeUserFromAllChannels(User & user) {
+   std::map<std::string, Channel>::iterator it;
+   
+	for (it = _channels.begin(); it != _channels.end(); ++it) {
+        it->second.removeUser(user);
+    }
+}
+
+void	ChannelServ::broadcastMessageToChannels(const std::string& message, User& sender) {
+	std::map<std::string, Channel>::iterator	it;
+	for (it = _channels.begin(); it != _channels.end(); ++it) {
+		if (this->isUserOnChannel(it->first, sender) == true) {
+			it->second.broadcastMessageOnChannel(message);
+		}
+	}
 }
 
 Channel*	ChannelServ::getChannel(const std::string& channelName) {
@@ -72,18 +88,6 @@ bool	ChannelServ::isChannelFull(std::string const & channelName) {
 	if (channel.getMaxUsersPerChannel() != 0 && users.size() == channel.getMaxUsersPerChannel())
 		return (true);
 	return (false);	
-}
-
-bool	ChannelServ::isUserBanned(std::string const & channelName, User & user) {
-	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
-	Channel channel = it->second;
-	std::vector<std::string> bannedUsers = channel.getBannedUsers();
-	std::vector<std::string>::iterator	vecIt;
-	for (vecIt = bannedUsers.begin(); vecIt != bannedUsers.end(); ++vecIt) {
-		if (*vecIt == user.getUsername())
-			return (true);
-	}
-	return (false);
 }
 
 bool	ChannelServ::isUserInvited(std::string const & channelName, User & user) {

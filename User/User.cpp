@@ -6,7 +6,7 @@
 /*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/14 14:42:16 by mkerkeni         ###   ########.fr       */
+/*   Updated: 2024/06/19 22:13:21 by mkerkeni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,10 @@ void    User::incJoinedChanNb(void) { this->_joinedChanNb++; }
 void    User::decJoinedChanNb(void) {
     if (this->_joinedChanNb > 0)
         this->_joinedChanNb--;
+}
+
+void		User::broadcastMessageToHimself(const std::string& message) {
+    send(this->_fd, message.c_str(), message.size(), 0);
 }
 
 int User::receiveData() {
