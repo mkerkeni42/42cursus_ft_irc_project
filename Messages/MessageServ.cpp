@@ -56,23 +56,25 @@ MessageServ::~MessageServ(void) {}
 void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::cout << "Handling USER command" << std::endl;
 	std::istringstream	iss(command);
-	std::string cmd, username, mode;
+	std::string cmd, username;
 
-	iss >> cmd >> username >> mode >> std::ws;
-	if (username.empty() || mode.empty())
+	iss >> cmd >> username >> std::ws;
+	if (username.empty())
 		throw (NeedMoreParamsException(cmd));
-	if (username.length() > 64 || mode.length() != 1)
+	if (username.length() > 64) {
+		// create a username/nickname exception
 		return;
+	}
 	for (size_t i = 0; i < username.length(); i++) {
-		if (!std::isalnum(username[i]) || username[i] != '_' || username[i] != '-')
+		if (!std::isalnum(username[i]) || username[i] != '_' || username[i] != '-') {
+			// throw username/nickname exception
 			return;
+		}
 	}
 	if (_userServ.isUserRegistered(username) == true)
 		throw (AlreadyRegisteredException());
-	if (mode != "0")
-		return;
 	user.setMode(0);
-	user.setUsername(username);
+	user.setUsername(username); // what is registration ?
 }
 
 void	MessageServ::handleNickCommand(std::string & command, User & user) {
@@ -85,8 +87,10 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 		throw (NoNicknameGivenException());
 	if (_userServ.isUserRegistered(user.getUsername()) == false)
 		throw (NotRegisteredException());
-	if (nickname.length() > 9)
+	if (nickname.length() > 9) {
+		// throw username/nickname exception
 		return;
+	}
 	for (size_t i = 0; i < nickname.length(); i++) {
 		if (!std::isalnum(nickname[i]) && nickname[i] != '_' && nickname[i] != '-')
 			throw (ErroneusNicknameException(nickname));
@@ -94,9 +98,9 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
     if (_userServ.isNicknameInUse(nickname) == true) {
         throw (NicknameInUseException(nickname));
 	}
-	user.setNickname(nickname, _userServ);
-	std::string message = ": " + user.getUsername() + " changed his nickname to " + nickname;
+	std::string message = ": " + user.getNickname() + " NICK " + nickname;
 	_channelServ.broadcastMessageToChannels(message, user);
+	user.setNickname(nickname, _userServ);
 }
 
 void	MessageServ::handlePassCommand(std::string & command, User & user) {
@@ -115,7 +119,6 @@ void	MessageServ::handleQuitCommand(std::string & command, User & user) {
 	
 	_channelServ.removeUserFromAllChannels(user);
 	_userServ.removeUser(user.getFD());
-	// is QUIT command make only the user that call it quit server or does it end server program ?
 	std::exit(EXIT_SUCCESS);
 }
 
@@ -132,15 +135,16 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 		throw (TooManyChannelsException(channel));
 	if (_channelServ.DoesChannelExist(channel) == false) {
 		for (size_t i = 0; i < channel.length(); i++) {
-			if (!std::isalnum(channel[i]) && channel[i] != '_' && channel[i] != '-')
+			if (!std::isalnum(channel[i]) && channel[i] != '_' && channel[i] != '-') {
+				// throw channel name exception
 				return;
+			}
 		}
 		_channelServ.createChannel(channel, user);
 		user.incJoinedChanNb();
 		return;
 	}
 	if (_channelServ.isUserOnChannel(channel, user) == true) {
-		//open channel window
 		return;
 	}
 	if (_channelServ.isChannelFull(channel) == true)
@@ -162,7 +166,6 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
     std::string cmd, channel;
 
     iss >> cmd >> channel >> std::ws;
-	// if we are out of chanel window
 	if (channel.empty() || channel[0] != '#')
 		throw (NeedMoreParamsException(cmd));
 	channel = channel.substr(1);
@@ -171,7 +174,6 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
 	_channelServ.leaveChannel(channel, user);
 	user.decJoinedChanNb();
 	// if there is no more users on channel, delete it
-	//need to find a way to detect if we are inside channel window or not
 }
 
 void	MessageServ::handleInviteCommand(std::string & command, User & user) {
@@ -196,7 +198,7 @@ void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	if (_channelServ.isUserOnChannel(channel, *guest) == true)
 		throw (UserOnChannelException((*guest).getUsername(), channel));
 	channelObj->setInvitedUsers((*guest).getUsername());
-	std::string	message = user.getNickname() + " invites you to join channel #" + channel;
+	std::string	message = user.getNickname() + " invites you to join channel #" + channel; // check server format for this message
 	_userServ.broadcastPrivateMessage(message, nickname);
 }
 
@@ -205,8 +207,8 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 	std::istringstream iss(command);
     std::string cmd, channel, nickname, message;
 
-    iss >> cmd >> channel >> std::ws;
-	std::getline(iss, message);
+    iss >> cmd >> channel >> nickname >> std::ws;
+	std::getline(iss, message); // need to check how it works
 	if (channel.empty() || channel[0] != '#' || nickname.empty())
 		throw (NeedMoreParamsException(cmd));
 	channel = channel.substr(1);
@@ -242,8 +244,10 @@ void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	Channel	*channelObj = _channelServ.getChannel(channel);
 	if (channelObj->getTopicMode() == CHANOP_ONLY && channelObj->isOperator(user.getUsername()) == false)
 		throw (ChanOPrivsNeededException(channel));
-	if (topic.empty())
+	if (topic.empty()) {
 		std::cout << "Topic for #" << channel << ": " << channelObj->getTopic() << std::endl;
+	// maybe with broadcast message ?
+	}
 	else {
 		channelObj->setTopic(topic);
 		//std::cout << user.getUsername() << " changed the topic of #" << channel << " to " << message << std::endl;
@@ -287,8 +291,10 @@ void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string
 				throw (KeySetException(channel->getName()));
 			if (arg.empty())
 				throw (NeedMoreParamsException("MODE"));
-			if (arg.length() < 8 || arg.length() > 24)
+			if (arg.length() < 8 || arg.length() > 24) {
+				// throw password exception
 				return;
+			}
 			channel->setPasswordMode(ENABLED);
 			channel->setPassword(arg);
 			channel->setMode(PROTECTED);
@@ -302,8 +308,10 @@ void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string
 		}
 		case 'l': {
 			for (size_t i = 0; i < arg.length(); i++) {
-				if (std::isdigit(arg[i]) == false)
+				if (std::isdigit(arg[i]) == false) {
+					// throw exception for bad characters
 					return;
+				}
 			}
 			channel->setMaxUsersPerChannel(std::atoi(arg.c_str()));
 			break;
@@ -350,7 +358,7 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 		throw (NeedMoreParamsException(cmd));
 	if (message.empty())
 		throw (NoTextToSendException());
-	message = ": " + user.getNickname() + message;
+	message = ": " + user.getNickname() + " :" + message;
 	if (recipient[0] == '#')
 		recipient = recipient.substr(1);
 	if (_channelServ.DoesChannelExist(recipient) == true) {
@@ -359,8 +367,8 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 		_channelServ.getChannel(recipient)->broadcastMessageOnChannel(message);
 	}
 	else if (_userServ.isNicknameInUse(recipient) == true) {
+		message = ":" + user.getNickname() + "PRIVMSG " + recipient + " :" + message;
 		_userServ.broadcastPrivateMessage(message, recipient);
-		std::cout << user.getNickname() << ": " << message << std::endl;
 	}
 	else
 		throw (NoSuchNickException(recipient));

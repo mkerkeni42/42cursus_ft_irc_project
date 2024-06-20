@@ -16,12 +16,12 @@ UP = UP = \033[A
 #------------------------------------SRCS-------------------------------------#
 
 SRC = 	main.cpp \
+		NetworkServ.cpp \
 		Messages/MessageServ.cpp \
 		User/User.cpp \
 		User/UserServ.cpp \
 		Channel/Channel.cpp \
 		Channel/ChannelServ.cpp \
-		#NetworkServ.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

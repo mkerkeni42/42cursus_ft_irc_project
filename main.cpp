@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "config.hpp"
+#include "NetworkServ.hpp"
 #include "User/User.hpp"
 #include "User/UserServ.hpp"
 #include "Messages/MessageServ.hpp"
@@ -66,14 +67,13 @@ int	main(int ac, char **av) {
 		return (1);
 	if (check_password(av[2]) == false)
 		return (1);
-	try {
-		UserServ		newUserServ("1234");
-		newUserServ.addUser(3);
-		newUserServ.handleUserActivity(3);
-	}
-	catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
-		return (1);
-	}
+	std::string	port = av[1];
+	int portNb = std::atoi(port.c_str());
+    std::string password = av[2];
+	NetworkServ server(portNb, password);
+	server.run();
+	/*UserServ		newUserServ("1234");
+	newUserServ.addUser(3);
+	newUserServ.handleUserActivity(3);*/
 	return (0);
 }

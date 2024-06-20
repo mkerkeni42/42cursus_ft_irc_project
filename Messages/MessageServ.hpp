@@ -33,7 +33,7 @@ public:
 
 private:
 
-	std::map<std::string, CommandHandler>	_commandMap;     
+	std::map<std::string, CommandHandler>	_commandMap;
     UserServ&                               _userServ;
     ChannelServ&                            _channelServ;
 
