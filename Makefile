@@ -16,6 +16,8 @@ UP = UP = \033[A
 #------------------------------------SRCS-------------------------------------#
 
 SRC = 	main.cpp \
+		Channel/Channel.cpp \
+		Channel/ChannelServ.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
