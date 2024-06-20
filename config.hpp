@@ -23,9 +23,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <cstring>
 #include <algorithm>
+#include <string>
+#include <cstdio>
+#include <fcntl.h>
+#include <poll.h>
 
 #define BOLD "\033[1m"
 #define UNDERLINE "\033[4m"

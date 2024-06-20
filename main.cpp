@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "config.hpp"
-#include "NetworkServ.hpp"
+#include "Network/NetworkServ.hpp"
 #include "User/User.hpp"
 #include "User/UserServ.hpp"
 #include "Messages/MessageServ.hpp"

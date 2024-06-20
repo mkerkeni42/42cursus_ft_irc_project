@@ -38,6 +38,7 @@ MessageServ::MessageServ(UserServ & userServ, ChannelServ & channelServ) : _user
 	_commandMap["TOPIC"] = &MessageServ::handleTopicCommand;
 	_commandMap["MODE"] = &MessageServ::handleModeCommand;
 	_commandMap["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
+	_commandMap["CAP"] = &MessageServ::handleCapCommand;
 	//_commandMap["PING"] = &MessageServ::handlePingCommand;
 }
 
@@ -52,6 +53,28 @@ void	MessageServ::handleCommand(std::string & command, User& user) {
 }
 
 MessageServ::~MessageServ(void) {}
+
+void MessageServ::handleCapCommand(std::string & command, User & user) {
+    std::cout << "Handling CAP command: " << command << std::endl;
+    std::istringstream iss(command);
+    std::string cmd, subCommand, capabilities;
+
+    iss >> cmd >> subCommand >> capabilities >> std::ws;
+    if (subCommand == "LS") {
+        std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " LS :multi-prefix\r\n";
+        send(user.getFD(), response.c_str(), response.size(), 0);
+    } else if (subCommand == "REQ") {
+        std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK :" + capabilities + "\r\n";
+        send(user.getFD(), response.c_str(), response.size(), 0);
+    } else if (subCommand == "END") {
+        std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " END\r\n";
+        send(user.getFD(), response.c_str(), response.size(), 0);
+    } else {
+        std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
+        send(user.getFD(), response.c_str(), response.size(), 0);
+        throw UnknownCommandException(cmd);
+    }
+}
 
 void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::cout << "Handling USER command" << std::endl;
@@ -125,9 +148,9 @@ void	MessageServ::handleQuitCommand(std::string & command, User & user) {
 void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	std::cout << "Handling JOIN command" << std::endl;
 	std::istringstream iss(command);
-    std::string cmd, channel, passwd;
+    std::string cmd, channel, key;
 
-    iss >> cmd >> channel >> passwd >> std::ws;
+    iss >> cmd >> channel >> key >> std::ws;
 	if (channel.empty() || channel[0] != '#')
 		throw (NeedMoreParamsException(cmd));
 	channel = channel.substr(1);
@@ -152,8 +175,8 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	if (_channelServ.getChannel(channel)->getMode() == INVITE_ONLY \
 		&& _channelServ.isUserInvited(channel, user) == false)
 			throw (InviteOnlyChanException(channel));
-	if (_channelServ.getChannel(channel)->getMode() == PROTECTED && (passwd.empty()
-		|| _channelServ.getChannel(channel)->getPassword() != passwd)) {
+	if (_channelServ.getChannel(channel)->getMode() == PROTECTED && (key.empty()
+		|| _channelServ.getChannel(channel)->getPassword() != key)) {
 			throw (BadChannelKeyException(channel));
 	}
 	_channelServ.joinChannel(channel, user);
@@ -330,8 +353,8 @@ void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::str
 		case 'k': {
 			channel->setPasswordMode(DISABLED);
 			channel->setMode(PUBLIC);
-			std::string	emptyPasswd = "";
-			channel->setPassword(emptyPasswd);
+			std::string	emptykey = "";
+			channel->setPassword(emptykey);
 			break;
 		}
 		case 'o': {

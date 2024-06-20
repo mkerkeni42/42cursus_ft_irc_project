@@ -1,11 +1,4 @@
 #include "NetworkServ.hpp"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <iostream>
-#include <cstring>
-#include <algorithm>
 
 NetworkServ::NetworkServ(int port, const std::string& password) : _userServ(password) {
     // Create the server socket

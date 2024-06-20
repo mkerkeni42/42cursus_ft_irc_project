@@ -50,5 +50,6 @@ private:
     void    handleSetMode(Channel *channel, char const & mode, std::string arg);
     void    handleRemoveMode(Channel *channel, char const & mode, std::string arg);
     void	handlePrivmsgCommand(std::string & command, User & user);
+    void    handleCapCommand(std::string & command, User & user);
     //void	handlePingCommand(std::string & command, User & user);
 };

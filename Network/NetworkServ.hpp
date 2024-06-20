@@ -1,13 +1,9 @@
 #ifndef NETWORKSERV_HPP
 #define NETWORKSERV_HPP
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <cstdio>
-#include <poll.h>
-#include "User/UserServ.hpp"
+#include "../config.hpp"
+#include "../exceptions.hpp"
+#include "../User/UserServ.hpp"
 
 class    NetworkServ {
     public:
@@ -18,8 +14,8 @@ class    NetworkServ {
         void    handleClientActivity(struct pollfd& pfd);
         void    removeClient(int fd);
 
-        int                                _serverFd;
-        std::vector<struct pollfd>        _fds;
+        int                             _serverFd;
+        std::vector<struct pollfd>      _fds;
         std::map<int, struct pollfd>    _fdMap;
         UserServ                        _userServ;
 };
