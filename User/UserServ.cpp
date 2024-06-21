@@ -9,7 +9,6 @@ UserServ::~UserServ(void) {}
 void	UserServ::addUser(int fd) {
 	User	newUser(fd);
 	this->_users[fd] = newUser;
-	newUser.setUsername("default");
 }
 
 void	UserServ::addUserByNickname(std::string const & nickname, User* user) {

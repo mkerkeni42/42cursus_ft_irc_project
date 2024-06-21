@@ -94,7 +94,7 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 		throw (AlreadyRegisteredException());
 	user.setMode(0);
 	user.setUsername(username);
-	std::string response = ":irc.myyamin.chat 001 " + username + " :Welcome to the irc Network, " + username+ "[!" + username + "@localhost";
+	std::string response = ":irc.myyamin.chat " + username +  "\r\n";
     user.broadcastMessageToHimself(response);
 }
 
@@ -120,7 +120,7 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
         throw (NicknameInUseException(nickname));
 	}
 	user.setNickname(nickname, _userServ);
-	std::string message = ":irc.myyamin.chat NICK " + nickname;
+	std::string message = ":irc.myyamin.chat NICK " + nickname + "\r\n";
 	_channelServ.broadcastMessageToChannels(message, user);
 }
 
@@ -132,7 +132,7 @@ void	MessageServ::handlePassCommand(std::string & command, User & user) {
 	if (password.length() < 8 || password.length() > 24)
 		return;
     user.setPassword(password);
-	std::string response = ":irc.myyamin.chat PASS ";
+	std::string response = ":irc.myyamin.chat PASS\r\n";
     user.broadcastMessageToHimself(response); // what is registration ?
 
 }
@@ -182,8 +182,9 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	}
 	_channelServ.joinChannel(channel, user);
 	user.incJoinedChanNb();
-	std::string response = ":irc.myyamin.chat JOIN " + user.getNickname();
+	std::string response = ":irc.myyamin.chat JOIN " + user.getNickname() + "\r\n";
     user.broadcastMessageToHimself(response);
+	// need to handle multiple channels in one JOIN comand
 }
 
 void	MessageServ::handlePartCommand(std::string & command, User & user) {
@@ -302,6 +303,9 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 		handleSetMode(channelObj, mode[1], arg);
 	else if (mode[0] == '-')
 		handleRemoveMode(channelObj, mode[1], arg);
+	std::string response = ":irc.myyamin.chat MODE " + user.getNickname() + channel + mode + arg + "\r\n";
+    user.broadcastMessageToHimself(response);
+	// need to handle multiple options for Mode command like "MODE +iot"
 }
 
 void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string arg) {
@@ -398,6 +402,7 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 	}
 	else
 		throw (NoSuchNickException(recipient));
+	// need to handle multiple recipients ??
 }
 
 /*void	MessageServ::handlePingCommand(std::string & command, User & user) {
