@@ -44,12 +44,16 @@ MessageServ::MessageServ(UserServ & userServ, ChannelServ & channelServ) : _user
 
 void	MessageServ::handleCommand(std::string & command, User& user) {
 	std::string	cmd = get_cmd(command);
-	std::map<std::string, CommandHandler>::iterator it = _commandMap.find(cmd);
-    if (it != _commandMap.end())
-    	(this->*(it->second))(command, user);
-    else
-    	throw (UnknownCommandException(cmd));
-	
+	try {
+		std::map<std::string, CommandHandler>::iterator it = _commandMap.find(cmd);
+		if (it != _commandMap.end())
+			(this->*(it->second))(command, user);
+		else
+			throw (UnknownCommandException(cmd));
+	}
+	catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+	}
 }
 
 MessageServ::~MessageServ(void) {}
@@ -97,7 +101,10 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	if (_userServ.isUserRegistered(username) == true)
 		throw (AlreadyRegisteredException());
 	user.setMode(0);
-	user.setUsername(username); // what is registration ?
+	user.setUsername(username);
+
+	std::string response = ":irc.myyamin.chat USER " + username;
+    user.broadcastMessageToHimself(response);
 }
 
 void	MessageServ::handleNickCommand(std::string & command, User & user) {
@@ -121,9 +128,9 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
     if (_userServ.isNicknameInUse(nickname) == true) {
         throw (NicknameInUseException(nickname));
 	}
-	std::string message = ": " + user.getNickname() + " NICK " + nickname;
-	_channelServ.broadcastMessageToChannels(message, user);
 	user.setNickname(nickname, _userServ);
+	std::string message = ":irc.myyamin.chat NICK " + nickname;
+	_channelServ.broadcastMessageToChannels(message, user);
 }
 
 void	MessageServ::handlePassCommand(std::string & command, User & user) {
@@ -134,6 +141,9 @@ void	MessageServ::handlePassCommand(std::string & command, User & user) {
 	if (password.length() < 8 || password.length() > 24)
 		return;
     user.setPassword(password);
+	std::string response = ":irc.myyamin.chat PASS ";
+    user.broadcastMessageToHimself(response); // what is registration ?
+
 }
 
 void	MessageServ::handleQuitCommand(std::string & command, User & user) {
@@ -181,6 +191,8 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	}
 	_channelServ.joinChannel(channel, user);
 	user.incJoinedChanNb();
+	std::string response = ":irc.myyamin.chat JOIN " + user.getNickname();
+    user.broadcastMessageToHimself(response);
 }
 
 void	MessageServ::handlePartCommand(std::string & command, User & user) {
