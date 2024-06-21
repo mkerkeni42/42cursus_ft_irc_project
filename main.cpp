@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/31 10:16:49 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/05/31 10:16:49 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "config.hpp"
 #include "Network/NetworkServ.hpp"
 #include "User/User.hpp"
@@ -72,8 +60,5 @@ int	main(int ac, char **av) {
     std::string password = av[2];
 	NetworkServ server(portNb, password);
 	server.run();
-	/*UserServ		newUserServ("1234");
-	newUserServ.addUser(3);
-	newUserServ.handleUserActivity(3);*/
 	return (0);
 }

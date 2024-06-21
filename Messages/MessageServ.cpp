@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   MessageServ.cpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/07 14:05:12 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/07 14:05:12 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "MessageServ.hpp"
 #include "../User/UserServ.hpp"
 #include "../User/User.hpp"
@@ -83,17 +71,17 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
 void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::cout << "Handling USER command" << std::endl;
 	std::istringstream	iss(command);
-	std::string cmd, username;
+	std::string cmd, username, mode, unused, realname;
 
-	iss >> cmd >> username >> std::ws;
-	if (username.empty())
+	iss >> cmd >> username >>  mode >> unused >> std::ws;
+	if (username.empty() || mode.empty() || unused.empty())
 		throw (NeedMoreParamsException(cmd));
 	if (username.length() > 64) {
 		// create a username/nickname exception
 		return;
 	}
 	for (size_t i = 0; i < username.length(); i++) {
-		if (!std::isalnum(username[i]) || username[i] != '_' || username[i] != '-') {
+		if (!std::isalnum(username[i]) && username[i] != '_' && username[i] != '-') {
 			// throw username/nickname exception
 			return;
 		}
@@ -102,8 +90,7 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 		throw (AlreadyRegisteredException());
 	user.setMode(0);
 	user.setUsername(username);
-
-	std::string response = ":irc.myyamin.chat USER " + username;
+	std::string response = ":irc.myyamin.chat " + command;
     user.broadcastMessageToHimself(response);
 }
 
