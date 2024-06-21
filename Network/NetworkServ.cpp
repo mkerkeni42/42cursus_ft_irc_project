@@ -75,8 +75,11 @@ void NetworkServ::acceptNewConnection() {
 
     // Add the user to the _UserServ
     _userServ.addUser(clientFd);
-    std::string response = ":irc.myyamin.chat 001 " + _userServ.getUsername(clientFd) + " :Welcome to the irc Network, " + _userServ.getUsername(clientFd) + "[!" + _userServ.getUsername(clientFd) + "@localhost";
-    send(clientFd, response.c_str(), response.size(), 0);
+    std::ostringstream message;
+    message << ":irc.myyamin.chat 001 " << _userServ.getUsername(clientFd) << " Welcome to the irc Network, " << _userServ.getUsername(clientFd) << "[!" << _userServ.getUsername(clientFd) <<  "@localhost\r\n";
+    std::string response = message.str();
+    int bytes = send(clientFd, response.c_str(), response.size(), 0);
+    std::cout << bytes << std::endl;
 }
 
 void NetworkServ::handleClientActivity(struct pollfd &pfd) {
