@@ -1,6 +1,6 @@
 #include "NetworkServ.hpp"
 
-NetworkServ::NetworkServ(int port, const std::string& password) : _userServ(password) {
+NetworkServ::NetworkServ(int port, std::string& password) : _userServ(password, *this) {
     // Create the server socket
     _serverFd = socket(AF_INET, SOCK_STREAM, 0);
     if (_serverFd < 0) {
@@ -75,6 +75,8 @@ void NetworkServ::acceptNewConnection() {
 
     // Add the user to the _UserServ
     _userServ.addUser(clientFd);
+    std::string response = ":irc.myyamin.chat 001 " + _userServ.getUsername(clientFd) + " :Welcome to the irc Network, " + _userServ.getUsername(clientFd) + "[!" + _userServ.getUsername(clientFd) + "@localhost";
+    send(clientFd, response.c_str(), response.size(), 0);
 }
 
 void NetworkServ::handleClientActivity(struct pollfd &pfd) {
@@ -99,5 +101,5 @@ void NetworkServ::removeClient(int fd) {
     _fdMap.erase(fd);
 
     // Remove the user from the _UserServ
-    _userServ.removeUser(fd);
+    //_userServ.removeUser(fd);
 }

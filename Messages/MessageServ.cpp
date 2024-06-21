@@ -54,16 +54,20 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
     iss >> cmd >> subCommand >> capabilities >> std::ws;
     if (subCommand == "LS") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " LS :multi-prefix\r\n";
-        send(user.getFD(), response.c_str(), response.size(), 0);
+        if (send(user.getFD(), response.c_str(), response.size(), 0))
+			std::cerr << "ERROR 1: send call failed" << std::endl;
     } else if (subCommand == "REQ") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK :" + capabilities + "\r\n";
-        send(user.getFD(), response.c_str(), response.size(), 0);
+        if (send(user.getFD(), response.c_str(), response.size(), 0))
+			std::cerr << "ERROR 2: send call failed" << std::endl;
     } else if (subCommand == "END") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " END\r\n";
-        send(user.getFD(), response.c_str(), response.size(), 0);
+        if (send(user.getFD(), response.c_str(), response.size(), 0))
+			std::cerr << "ERROR 3: send call failed" << std::endl;
     } else {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
-        send(user.getFD(), response.c_str(), response.size(), 0);
+        if (send(user.getFD(), response.c_str(), response.size(), 0))
+			std::cerr << "ERROR 4: send call failed" << std::endl;
         throw UnknownCommandException(cmd);
     }
 }
@@ -90,7 +94,7 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 		throw (AlreadyRegisteredException());
 	user.setMode(0);
 	user.setUsername(username);
-	std::string response = ":irc.myyamin.chat " + command;
+	std::string response = ":irc.myyamin.chat 001 " + username + " :Welcome to the irc Network, " + username+ "[!" + username + "@localhost";
     user.broadcastMessageToHimself(response);
 }
 
@@ -138,8 +142,8 @@ void	MessageServ::handleQuitCommand(std::string & command, User & user) {
 	(void)command;
 	
 	_channelServ.removeUserFromAllChannels(user);
+	_userServ.removeUserfromNetwork(user.getFD());
 	_userServ.removeUser(user.getFD());
-	std::exit(EXIT_SUCCESS);
 }
 
 void	MessageServ::handleJoinCommand(std::string & command, User & user) {

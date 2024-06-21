@@ -74,6 +74,7 @@ bool	Channel::isOperator(std::string const & username) const {
 void	Channel::broadcastMessageOnChannel(const std::string& message) {
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
-		send(user->getFD(), message.c_str(), message.size(), 0);
+		if (send(user->getFD(), message.c_str(), message.size(), 0))
+			std::cerr << "ERROR: send call failed" << std::endl;
 	}
 }

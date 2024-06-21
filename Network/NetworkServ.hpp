@@ -5,14 +5,15 @@
 #include "../exceptions.hpp"
 #include "../User/UserServ.hpp"
 
+
 class    NetworkServ {
     public:
-        NetworkServ(int port, const std::string& password);
+        NetworkServ(int port, std::string& password);
         void    run();
+        void    removeClient(int fd);
     private:
         void    acceptNewConnection();
         void    handleClientActivity(struct pollfd& pfd);
-        void    removeClient(int fd);
 
         int                             _serverFd;
         std::vector<struct pollfd>      _fds;
