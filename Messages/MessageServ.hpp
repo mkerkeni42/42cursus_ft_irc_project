@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   MessageServ.hpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/07 14:04:42 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/07 14:04:42 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #pragma once
 
 #include "../config.hpp"
@@ -33,7 +21,7 @@ public:
 
 private:
 
-	std::map<std::string, CommandHandler>	_commandMap;     
+	std::map<std::string, CommandHandler>	_commandMap;
     UserServ&                               _userServ;
     ChannelServ&                            _channelServ;
 
@@ -50,5 +38,6 @@ private:
     void    handleSetMode(Channel *channel, char const & mode, std::string arg);
     void    handleRemoveMode(Channel *channel, char const & mode, std::string arg);
     void	handlePrivmsgCommand(std::string & command, User & user);
+    void    handleCapCommand(std::string & command, User & user);
     //void	handlePingCommand(std::string & command, User & user);
 };

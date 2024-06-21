@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   config.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/31 14:07:44 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/05/31 14:07:44 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #pragma once
 
 #include <iostream>
@@ -23,9 +11,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <cstring>
 #include <algorithm>
+#include <string>
+#include <cstdio>
+#include <fcntl.h>
+#include <poll.h>
 
 #define BOLD "\033[1m"
 #define UNDERLINE "\033[4m"
@@ -61,7 +52,7 @@
 #define ERR_UNKNOWNMODE 472
 #define ERR_INVITEONLYCHAN 473
 #define ERR_BADCHANNELKEY 475
-#define ERR_CHANOPRIVSNEEDED 471
+#define ERR_CHANOPRIVSNEEDED 482
 
 #define MAX_CHANNELS_PER_USER 10
 

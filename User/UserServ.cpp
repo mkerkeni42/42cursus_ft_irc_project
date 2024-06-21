@@ -1,25 +1,15 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   UserServ.cpp                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/03 10:58:31 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/19 22:00:12 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "UserServ.hpp"
 #include "User.hpp"
+#include "../Network/NetworkServ.hpp"
 
-UserServ::UserServ(std::string const & password) : _password(password), _messageServ(*this, _channelServ), _channelServ() {}
+UserServ::UserServ(std::string & password, NetworkServ &networkServ) : _password(password), _networkServ(networkServ), _messageServ(*this, _channelServ), _channelServ() {}
 
 UserServ::~UserServ(void) {}
 
 void	UserServ::addUser(int fd) {
 	User	newUser(fd);
 	this->_users[fd] = newUser;
+	newUser.setUsername("default");
 }
 
 void	UserServ::addUserByNickname(std::string const & nickname, User* user) {
@@ -28,8 +18,10 @@ void	UserServ::addUserByNickname(std::string const & nickname, User* user) {
 
 void	UserServ::removeUser(int fd) {
 	User	&user = this->_users[fd];
-	_nicknameMap.erase(user.getNickname());
-	this->_users.erase(fd);
+	if (_nicknameMap.find(user.getNickname()) != _nicknameMap.end())
+		_nicknameMap.erase(user.getNickname());
+	if (_users.find(fd) != _users.end())
+		this->_users.erase(fd);
 }
 
 int		UserServ::handleUserActivity(int fd) {
@@ -45,7 +37,8 @@ int		UserServ::handleUserActivity(int fd) {
 
 void	UserServ::broadcastPrivateMessage(const std::string& message, std::string& recipient) {
 	User	*user = getUserByNickname(recipient);
-	send(user->getFD(), message.c_str(), message.size(), 0);
+	if (send(user->getFD(), message.c_str(), message.size(), 0) == -1)
+		std::cerr << "ERROR: send call failed" << std::endl;
 }
 
 User	*UserServ::getUserByNickname(std::string const & nickname) {
@@ -54,6 +47,19 @@ User	*UserServ::getUserByNickname(std::string const & nickname) {
         return it->second;
     }
     return (NULL);
+}
+
+std::string	UserServ::getUsername(int fd) {
+	std::map<int, User>::iterator it = _users.find(fd);
+    if (it != _users.end()) {
+        User	user = it->second;
+		return (user.getUsername());
+    }
+    return (NULL);
+}
+
+void	UserServ::removeUserfromNetwork(int fd) {
+	_networkServ.removeClient(fd);
 }
 
 void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user) {

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Channel.cpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ykifadji <ykifadji@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/03 16:12:23 by ykifadji          #+#    #+#             */
-/*   Updated: 2024/06/20 08:40:26 by ykifadji         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Channel.hpp"
 #include "../User/User.hpp"
 
@@ -86,6 +74,7 @@ bool	Channel::isOperator(std::string const & username) const {
 void	Channel::broadcastMessageOnChannel(const std::string& message) {
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
-		send(user->getFD(), message.c_str(), message.size(), 0);
+		if (send(user->getFD(), message.c_str(), message.size(), 0))
+			std::cerr << "ERROR: send call failed" << std::endl;
 	}
 }

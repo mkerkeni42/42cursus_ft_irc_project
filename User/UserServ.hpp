@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   UserServ.hpp                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/03 10:57:42 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/19 22:01:01 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #pragma once
 
 #include "../config.hpp"
@@ -20,12 +8,13 @@
 
 class	User;
 class	MessageServ;
+class	NetworkServ;
 
 class	UserServ {
 
 public:
 
-	UserServ(std::string const & password);
+	UserServ(std::string & password, NetworkServ &networkServ);
 	~UserServ(void);
 	
 	void	addUser(int fd);
@@ -36,6 +25,8 @@ public:
 	void	broadcastPrivateMessage(const std::string& message, std::string& recipient);
 	
 	User	*getUserByNickname(std::string const & nickname);
+	std::string	getUsername(int fd);
+	void		removeUserfromNetwork(int fd);
 	void	updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user);
 	
 	bool 	isUserRegistered(const std::string & username);
@@ -44,6 +35,7 @@ public:
 private:
 	
 	std::string						_password;
+	NetworkServ&					_networkServ;
 	MessageServ						_messageServ;
 	ChannelServ						_channelServ;
 	std::map<int, User> 			_users;

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   User.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mkerkeni <mkerkeni@student.42nice.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/03 10:58:39 by mkerkeni          #+#    #+#             */
-/*   Updated: 2024/06/19 22:13:21 by mkerkeni         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "User.hpp"
 #include "UserServ.hpp"
 
@@ -57,13 +45,16 @@ void    User::decJoinedChanNb(void) {
 }
 
 void		User::broadcastMessageToHimself(const std::string& message) {
-    send(this->_fd, message.c_str(), message.size(), 0);
+    if (send(this->_fd, message.c_str(), message.size(), 0) == -1) {
+        std::cerr << "ERROR: send call failed" << std::endl;
+    }
 }
 
 int User::receiveData() {
     char buf[512];
     int bytesRead = recv(_fd, buf, sizeof(buf), 0);
     if (bytesRead <= 0) {
+        std::cerr << "ERROR: recv call failed" << std::endl;
         return -1;
     }
     _buffer.append(buf, bytesRead);
