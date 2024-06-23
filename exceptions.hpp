@@ -6,7 +6,7 @@ class	NoSuchNickException : public std::exception {
 public:
 	NoSuchNickException(const std::string& nick) : _nick(nick) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NOSUCHNICKNAME << " " << _nick << " :No such nick/channel";
+		message << ":irc.myyamin.chat " << ERR_NOSUCHNICK << " " << _nick << " :No such nick/channel";
 		_message = message.str();
 	}
 	virtual	~NoSuchNickException() throw () {}

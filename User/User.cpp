@@ -3,7 +3,7 @@
 
 User::User(void) {}
 
-User::User(int fd) : _fd(fd), _username("*"), _joinedChanNb(0) {}
+User::User(int fd) : _fd(fd), _username("*"), _nickname("*"), _joinedChanNb(0) {}
 
 User::~User(void) {}
 

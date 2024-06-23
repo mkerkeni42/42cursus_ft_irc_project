@@ -26,6 +26,7 @@ public:
 	
 	User	*getUserByNickname(std::string const & nickname);
 	std::string	getUsername(int fd);
+	std::string	getNickname(int fd);
 	void		removeUserfromNetwork(int fd);
 	void	updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user);
 	

@@ -57,6 +57,15 @@ std::string	UserServ::getUsername(int fd) {
     return (NULL);
 }
 
+std::string	UserServ::getNickname(int fd) {
+	std::map<int, User>::iterator it = _users.find(fd);
+    if (it != _users.end()) {
+        User	user = it->second;
+		return (user.getNickname());
+    }
+    return (NULL);
+}
+
 void	UserServ::removeUserfromNetwork(int fd) {
 	_networkServ.removeClient(fd);
 }

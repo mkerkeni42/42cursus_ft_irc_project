@@ -40,7 +40,11 @@ void	MessageServ::handleCommand(std::string & command, User& user) {
 			throw (UnknownCommandException(cmd));
 	}
 	catch (std::exception &e) {
-		std::cerr << e.what() << std::endl;
+		//std::cerr << e.what() << std::endl;
+		std::ostringstream message;
+		message << e.what() << "\r\n";
+		std::string	response = message.str();
+		user.broadcastMessageToHimself(response.c_str());
 	}
 }
 
@@ -54,22 +58,52 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
     iss >> cmd >> subCommand >> capabilities >> std::ws;
     if (subCommand == "LS") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " LS :multi-prefix\r\n";
-        if (send(user.getFD(), response.c_str(), response.size(), 0))
-			std::cerr << "ERROR 1: send call failed" << std::endl;
+       user.broadcastMessageToHimself(response);
     } else if (subCommand == "REQ") {
-        std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK :" + capabilities + "\r\n";
-        if (send(user.getFD(), response.c_str(), response.size(), 0))
-			std::cerr << "ERROR 2: send call failed" << std::endl;
+		if (capabilities == ":multi-prefix") {
+            std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ACK " + capabilities + "\r\n";
+            user.broadcastMessageToHimself(response);
+        } else {
+            std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK " + capabilities + "\r\n";
+            user.broadcastMessageToHimself(response);
+        }
+      //  std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK " + capabilities + "\r\n";
+       // user.broadcastMessageToHimself(response);
     } else if (subCommand == "END") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " END\r\n";
-        if (send(user.getFD(), response.c_str(), response.size(), 0))
-			std::cerr << "ERROR 3: send call failed" << std::endl;
+        user.broadcastMessageToHimself(response);
+		sendWelcomeMessages(user);
     } else {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
-        if (send(user.getFD(), response.c_str(), response.size(), 0))
-			std::cerr << "ERROR 4: send call failed" << std::endl;
-        throw UnknownCommandException(cmd);
+        user.broadcastMessageToHimself(response);
     }
+}
+
+void MessageServ::sendWelcomeMessages(User &user) {
+    std::string welcome = ":irc.myyamin.chat 001 " + user.getNickname() + " :Welcome to the IRC network\r\n";
+    user.broadcastMessageToHimself(welcome);
+
+    std::string yourHost = ":irc.myyamin.chat 002 " + user.getNickname() + " :Your host is irc.myyamin.chat, running version 1.0\r\n";
+    user.broadcastMessageToHimself(yourHost);
+
+    std::string created = ":irc.myyamin.chat 003 " + user.getNickname() + " :This server was created today\r\n";
+    user.broadcastMessageToHimself(created);
+
+    std::string myInfo = ":irc.myyamin.chat 004 " + user.getNickname() + " irc.myyamin.chat 1.0 o o\r\n";
+    user.broadcastMessageToHimself(myInfo);
+
+    sendMotd(user);
+}
+
+void MessageServ::sendMotd(User &user) {
+    std::string motdStart = ":irc.myyamin.chat 375 " + user.getNickname() + " :- irc.myyamin.chat Message of the Day - \r\n";
+    user.broadcastMessageToHimself(motdStart);
+
+    std::string motd = ":irc.myyamin.chat 372 " + user.getNickname() + " :- Welcome to the best IRC server!\r\n";
+    user.broadcastMessageToHimself(motd);
+
+    std::string motdEnd = ":irc.myyamin.chat 376 " + user.getNickname() + " :End of /MOTD command.\r\n";
+    user.broadcastMessageToHimself(motdEnd);
 }
 
 void	MessageServ::handleUserCommand(std::string & command, User & user) {
@@ -78,18 +112,9 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::string cmd, username, mode, unused, realname;
 
 	iss >> cmd >> username >>  mode >> unused >> std::ws;
-	if (username.empty() || mode.empty() || unused.empty())
+	std::getline(iss, realname);
+	if (username.empty() || mode.empty() || unused.empty() || realname.empty())
 		throw (NeedMoreParamsException(cmd));
-	if (username.length() > 64) {
-		// create a username/nickname exception
-		return;
-	}
-	for (size_t i = 0; i < username.length(); i++) {
-		if (!std::isalnum(username[i]) && username[i] != '_' && username[i] != '-') {
-			// throw username/nickname exception
-			return;
-		}
-	}
 	if (_userServ.isUserRegistered(username) == true)
 		throw (AlreadyRegisteredException());
 	user.setMode(0);
@@ -109,8 +134,7 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 	if (_userServ.isUserRegistered(user.getUsername()) == false)
 		throw (NotRegisteredException());
 	if (nickname.length() > 9) {
-		// throw username/nickname exception
-		return;
+		throw (ErroneusNicknameException(nickname));
 	}
 	for (size_t i = 0; i < nickname.length(); i++) {
 		if (!std::isalnum(nickname[i]) && nickname[i] != '_' && nickname[i] != '-')
@@ -129,11 +153,9 @@ void	MessageServ::handlePassCommand(std::string & command, User & user) {
 	std::istringstream iss(command);
     std::string cmd, password;
     iss >> cmd >> password >> std::ws;
-	if (password.length() < 8 || password.length() > 24)
-		return;
     user.setPassword(password);
 	std::string response = ":irc.myyamin.chat PASS\r\n";
-    user.broadcastMessageToHimself(response); // what is registration ?
+    user.broadcastMessageToHimself(response);
 
 }
 
@@ -158,12 +180,6 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	if (user.getJoinedChanNb() == MAX_CHANNELS_PER_USER)
 		throw (TooManyChannelsException(channel));
 	if (_channelServ.DoesChannelExist(channel) == false) {
-		for (size_t i = 0; i < channel.length(); i++) {
-			if (!std::isalnum(channel[i]) && channel[i] != '_' && channel[i] != '-') {
-				// throw channel name exception
-				return;
-			}
-		}
 		_channelServ.createChannel(channel, user);
 		user.incJoinedChanNb();
 		return;

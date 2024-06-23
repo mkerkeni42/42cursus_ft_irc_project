@@ -9,6 +9,7 @@
 class    NetworkServ {
     public:
         NetworkServ(int port, std::string& password);
+        // maybe need to define a destructor in order to close all fds if server is closed before all clients quit 
         void    run();
         void    removeClient(int fd);
     private:
