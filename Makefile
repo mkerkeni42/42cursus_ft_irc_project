@@ -18,6 +18,7 @@ UP = UP = \033[A
 SRC = 	main.cpp \
 		Network/NetworkServ.cpp \
 		Messages/MessageServ.cpp \
+		Messages/Welcome.cpp \
 		User/User.cpp \
 		User/UserServ.cpp \
 		Channel/Channel.cpp \

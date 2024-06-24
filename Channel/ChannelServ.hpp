@@ -16,6 +16,7 @@ public:
 	void		joinChannel(const std::string & channelName, User & user);
 	void		leaveChannel(const std::string & channelName, User & user);
 	void		createChannel(const std::string & channelName, User & user);
+	void		deleteChannel(const std::string & channelName);
 	void		removeUserFromAllChannels(User & user);
 	void		broadcastMessageToChannels(const std::string& message, User& sender);
 	

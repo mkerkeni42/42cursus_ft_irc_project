@@ -23,6 +23,12 @@ void	ChannelServ::createChannel(const std::string & channelName, User & user) {
 	_channels[channelName] = newChannel;
 }
 
+void		ChannelServ::deleteChannel(const std::string & channelName) {
+	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
+	if (it != _channels.end())
+		_channels.erase(it);
+}
+
 void		ChannelServ::removeUserFromAllChannels(User & user) {
    std::map<std::string, Channel>::iterator it;
    

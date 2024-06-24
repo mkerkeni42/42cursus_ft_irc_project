@@ -40,7 +40,6 @@ void	MessageServ::handleCommand(std::string & command, User& user) {
 			throw (UnknownCommandException(cmd));
 	}
 	catch (std::exception &e) {
-		//std::cerr << e.what() << std::endl;
 		std::ostringstream message;
 		message << e.what() << "\r\n";
 		std::string	response = message.str();
@@ -67,8 +66,6 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
             std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK " + capabilities + "\r\n";
             user.broadcastMessageToHimself(response);
         }
-      //  std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " NAK " + capabilities + "\r\n";
-       // user.broadcastMessageToHimself(response);
     } else if (subCommand == "END") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " END\r\n";
         user.broadcastMessageToHimself(response);
@@ -77,33 +74,6 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
         user.broadcastMessageToHimself(response);
     }
-}
-
-void MessageServ::sendWelcomeMessages(User &user) {
-    std::string welcome = ":irc.myyamin.chat 001 " + user.getNickname() + " :Welcome to the IRC network\r\n";
-    user.broadcastMessageToHimself(welcome);
-
-    std::string yourHost = ":irc.myyamin.chat 002 " + user.getNickname() + " :Your host is irc.myyamin.chat, running version 1.0\r\n";
-    user.broadcastMessageToHimself(yourHost);
-
-    std::string created = ":irc.myyamin.chat 003 " + user.getNickname() + " :This server was created today\r\n";
-    user.broadcastMessageToHimself(created);
-
-    std::string myInfo = ":irc.myyamin.chat 004 " + user.getNickname() + " irc.myyamin.chat 1.0 o o\r\n";
-    user.broadcastMessageToHimself(myInfo);
-
-    sendMotd(user);
-}
-
-void MessageServ::sendMotd(User &user) {
-    std::string motdStart = ":irc.myyamin.chat 375 " + user.getNickname() + " :- irc.myyamin.chat Message of the Day - \r\n";
-    user.broadcastMessageToHimself(motdStart);
-
-    std::string motd = ":irc.myyamin.chat 372 " + user.getNickname() + " :- Welcome to the best IRC server!\r\n";
-    user.broadcastMessageToHimself(motd);
-
-    std::string motdEnd = ":irc.myyamin.chat 376 " + user.getNickname() + " :End of /MOTD command.\r\n";
-    user.broadcastMessageToHimself(motdEnd);
 }
 
 void	MessageServ::handleUserCommand(std::string & command, User & user) {
@@ -200,7 +170,7 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	user.incJoinedChanNb();
 	std::string response = ":irc.myyamin.chat JOIN " + user.getNickname() + "\r\n";
     user.broadcastMessageToHimself(response);
-	// need to handle multiple channels in one JOIN comand
+	// need to handle multiple channels in one JOIN command
 }
 
 void	MessageServ::handlePartCommand(std::string & command, User & user) {
@@ -216,7 +186,7 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
 		throw (NotOnChannelException(channel));
 	_channelServ.leaveChannel(channel, user);
 	user.decJoinedChanNb();
-	// if there is no more users on channel, delete it
+	// need to handle multiple channels in one PART command
 }
 
 void	MessageServ::handleInviteCommand(std::string & command, User & user) {
@@ -241,8 +211,12 @@ void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	if (_channelServ.isUserOnChannel(channel, *guest) == true)
 		throw (UserOnChannelException((*guest).getUsername(), channel));
 	channelObj->setInvitedUsers((*guest).getUsername());
-	std::string	message = user.getNickname() + " invites you to join channel #" + channel; // check server format for this message
-	_userServ.broadcastPrivateMessage(message, nickname);
+	//std::string	message = user.getNickname() + " invites you to join channel #" + channel; // check server format for this message
+	std::ostringstream	message;
+	message << ":irc.myyamin.chat " << RPL_INVITING << " " << user.getUsername() << guest->getNickname() << channel << "\r\n";
+	std::string	response = message.str();
+	_userServ.broadcastPrivateMessage(response.c_str(), nickname);
+	// need to handle multiple channels in one INVITE command
 }
 
 void	MessageServ::handleKickCommand(std::string & command, User & user) {
@@ -268,6 +242,7 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 	if (_channelServ.isUserOnChannel(channel, *troublemaker) == false)
 		throw (UserNotInChannelException((*troublemaker).getUsername(), channel));
 	_channelServ.leaveChannel(channel, *troublemaker);
+	// need to handle multiple channels in one KICK comman
 }
 
 void	MessageServ::handleTopicCommand(std::string & command, User & user) {
