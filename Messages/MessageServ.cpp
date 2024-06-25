@@ -27,11 +27,12 @@ MessageServ::MessageServ(UserServ & userServ, ChannelServ & channelServ) : _user
 	_commandMap["MODE"] = &MessageServ::handleModeCommand;
 	_commandMap["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
 	_commandMap["CAP"] = &MessageServ::handleCapCommand;
-	//_commandMap["PING"] = &MessageServ::handlePingCommand;
+	_commandMap["PING"] = &MessageServ::handlePingCommand;
 }
 
 void	MessageServ::handleCommand(std::string & command, User& user) {
 	std::string	cmd = get_cmd(command);
+	std::cout << command << std::endl;
 	try {
 		std::map<std::string, CommandHandler>::iterator it = _commandMap.find(cmd);
 		if (it != _commandMap.end())
@@ -50,7 +51,7 @@ void	MessageServ::handleCommand(std::string & command, User& user) {
 MessageServ::~MessageServ(void) {}
 
 void MessageServ::handleCapCommand(std::string & command, User & user) {
-    std::cout << "Handling CAP command: " << command << std::endl;
+    std::cout << "Handling CAP command: " << std::endl;
     std::istringstream iss(command);
     std::string cmd, subCommand, capabilities;
 
@@ -69,7 +70,8 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
     } else if (subCommand == "END") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " END\r\n";
         user.broadcastMessageToHimself(response);
-		sendWelcomeMessages(user);
+		response = ":irc.myyamin.chat You need to authenticate to connect to the server\r\n";
+   		user.broadcastMessageToHimself(response);
     } else {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
         user.broadcastMessageToHimself(response);
@@ -85,12 +87,10 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::getline(iss, realname);
 	if (username.empty() || mode.empty() || unused.empty() || realname.empty())
 		throw (NeedMoreParamsException(cmd));
-	if (_userServ.isUserRegistered(username) == true)
+	if (user.getUsername() != "*")
 		throw (AlreadyRegisteredException());
-	user.setMode(0);
+	user.setRealname(realname);
 	user.setUsername(username);
-	std::string response = ":irc.myyamin.chat " + username +  "\r\n";
-    user.broadcastMessageToHimself(response);
 }
 
 void	MessageServ::handleNickCommand(std::string & command, User & user) {
@@ -99,8 +99,12 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 	std::string cmd, nickname;
 
 	iss >> cmd >> nickname >> std::ws;
-	if (nickname.empty())
-		throw (NoNicknameGivenException());
+	std::cout << "old nickname = " << user.getNickname() << std::endl;
+	if (nickname.empty()) {
+		std::string message = ":irc.myyamin.chat NICK " + user.getUsername() + " :Your nickname is " + user.getNickname() + "\r\n";
+		return;
+		//throw (NoNicknameGivenException());
+	}
 	if (_userServ.isUserRegistered(user.getUsername()) == false)
 		throw (NotRegisteredException());
 	if (nickname.length() > 9) {
@@ -111,10 +115,11 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 			throw (ErroneusNicknameException(nickname));
 	}
     if (_userServ.isNicknameInUse(nickname) == true) {
-        throw (NicknameInUseException(nickname));
+        throw (NicknameInUseException(user.getUsername(), nickname));
 	}
+	std::string message = ":irc.myyamin.chat NICK " + nickname + " :" + user.getNickname() + " changed his nickname to " + nickname + "\r\n";
+	std::cout << message;
 	user.setNickname(nickname, _userServ);
-	std::string message = ":irc.myyamin.chat NICK " + nickname + "\r\n";
 	_channelServ.broadcastMessageToChannels(message, user);
 }
 
@@ -123,9 +128,14 @@ void	MessageServ::handlePassCommand(std::string & command, User & user) {
 	std::istringstream iss(command);
     std::string cmd, password;
     iss >> cmd >> password >> std::ws;
-    user.setPassword(password);
-	std::string response = ":irc.myyamin.chat PASS\r\n";
-    user.broadcastMessageToHimself(response);
+	if (password.empty())
+		throw (NeedMoreParamsException(cmd));
+	if (user.getRegistrationStatus() == true)
+		throw (AlreadyRegisteredException());
+	if (_userServ.getPassword() != password)
+		throw (PasswdMismatchException(user.getUsername()));
+    user.setRegistrationStatus(true);
+	sendWelcomeMessages(user);
 
 }
 
@@ -275,11 +285,14 @@ void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 void	MessageServ::handleModeCommand(std::string & command, User & user) {
 	std::cout << "Handling MODE command" << std::endl;
 	std::istringstream iss(command);
-    std::string cmd, channel, mode, arg;
-    iss >> cmd >> channel >> mode >> arg >> std::ws;
-	if (channel.empty() || channel[0] != '#' || mode.empty())
+    std::string cmd, target, mode, arg;
+    iss >> cmd >> target >> mode >> arg >> std::ws;
+	if (target.empty() || target[0] != '#') {
+		return;
+	}
+	std::string	channel = target.substr(1);
+	if (mode.empty())
 		throw (NeedMoreParamsException(cmd));
-	channel = channel.substr(1);
 	if (_channelServ.DoesChannelExist(channel) == false)
 		throw (NoSuchChannelException(channel));
 	if (_channelServ.isUserOnChannel(channel, user) == false)
@@ -294,7 +307,11 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 		handleSetMode(channelObj, mode[1], arg);
 	else if (mode[0] == '-')
 		handleRemoveMode(channelObj, mode[1], arg);
-	std::string response = ":irc.myyamin.chat MODE " + user.getNickname() + channel + mode + arg + "\r\n";
+	std::string response = ":irc.myyamin.chat MODE " + user.getNickname() + " " + channel + " " + mode;
+	if (!arg.empty())
+		response += " " + arg;
+	response += "\r\n";
+	std::cout << response << std::endl;
     user.broadcastMessageToHimself(response);
 	// need to handle multiple options for Mode command like "MODE +iot"
 }
@@ -396,6 +413,15 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 	// need to handle multiple recipients ??
 }
 
-/*void	MessageServ::handlePingCommand(std::string & command, User & user) {
+void	MessageServ::handlePingCommand(std::string & command, User & user) {
+	(void)user;
 	std::cout << "Handling PING command" << std::endl;
-}*/
+	std::istringstream iss(command);
+    std::string cmd, token;
+
+    iss >> cmd >> token >> std::ws;
+	if (token.empty())
+		throw (NeedMoreParamsException("PING"));
+	std::string response = "PONG irc.myyamin.chat :" + token + "\r\n";
+    user.broadcastMessageToHimself(response);
+}

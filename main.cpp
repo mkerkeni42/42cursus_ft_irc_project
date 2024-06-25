@@ -27,23 +27,16 @@ bool	check_port(char *arg) {
 
 bool	check_password(char* arg) {
 	std::string	entered_password = arg;
-	std::string	correct_password = "randompassword"; // Only for testing purposes
 
+	if (entered_password.length() < 4 || entered_password.length() > 24)
+		std::cerr << RED << "ERROR: Password must contain between 4 and 24 characters." << END << std::endl;
 	for (size_t i = 0; i < entered_password.length(); ++i) {
 		if (!std::isalnum(entered_password[i])) {
-			std::cout << YELLOW << "Password contains invalid characters." << END << std::endl;
-			sleep(1); // Delay for incorrect attempt
+			std::cout << RED << "ERROR: Password contains invalid characters." << END << std::endl;
 			return (false);
 		}
 	}
-
-	if (entered_password == correct_password) {
-		return (true);
-	} else {
-		std::cout << RED << "Incorrect password." << END << std::endl;
-		sleep(1); // Delay for incorrect attempt
-		return (false);
-	}
+	return (true);
 }
 
 int	main(int ac, char **av) {

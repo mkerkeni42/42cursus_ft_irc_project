@@ -25,6 +25,7 @@ public:
 	void	broadcastPrivateMessage(const std::string& message, std::string& recipient);
 	
 	User	*getUserByNickname(std::string const & nickname);
+	std::string	getPassword() const;
 	std::string	getUsername(int fd);
 	std::string	getNickname(int fd);
 	void		removeUserfromNetwork(int fd);

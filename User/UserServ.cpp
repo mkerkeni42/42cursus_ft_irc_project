@@ -48,6 +48,8 @@ User	*UserServ::getUserByNickname(std::string const & nickname) {
     return (NULL);
 }
 
+std::string	UserServ::getPassword() const { return (_password); }
+
 std::string	UserServ::getUsername(int fd) {
 	std::map<int, User>::iterator it = _users.find(fd);
     if (it != _users.end()) {
