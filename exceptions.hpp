@@ -321,6 +321,22 @@ private:
 	std::string	_message;
 };
 
+class	BadChanMaskException : public std::exception {
+public:
+	BadChanMaskException(const std::string& channel) : _channel(channel) {
+		std::ostringstream	message;
+		message << ":irc.myyamin.chat " << ERR_BADCHANMASK << " " << _channel << " :Bad channel mask\r\n";
+		_message = message.str();
+	}
+	virtual ~BadChanMaskException() throw () {}
+	virtual const char* what() const throw() { 
+		return (_message.c_str());
+	}
+private:
+	std::string	_channel;
+	std::string	_message;
+};
+
 class	ChanOPrivsNeededException : public std::exception {
 public:
 	ChanOPrivsNeededException(const std::string& channel) : _channel(channel) {

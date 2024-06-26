@@ -19,6 +19,12 @@ SRC = 	main.cpp \
 		Network/NetworkServ.cpp \
 		Messages/MessageServ.cpp \
 		Messages/Welcome.cpp \
+		Messages/Join.cpp \
+		Messages/Topic.cpp \
+		Messages/Kick.cpp \
+		Messages/Invite.cpp \
+		Messages/Mode.cpp \
+		Messages/Privmsg.cpp \
 		User/User.cpp \
 		User/UserServ.cpp \
 		Channel/Channel.cpp \
