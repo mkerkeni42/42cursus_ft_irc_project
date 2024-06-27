@@ -56,25 +56,35 @@ User*	Channel::getUserByNickname(const std::string& nickname) {
 
 const std::vector<User*>&	Channel::getUsers() const { return _users; }
 
-void	Channel::addOperator(const std::string& username) { _operators.push_back(username); }
+bool	Channel::isUserOnChannel(const std::string &nickname) {
+	std::map<std::string, User*>::iterator	it = _userMap.find(nickname);
+	std::cout << "nickname = " << nickname << std::endl;
+	if (it != _userMap.end())
+		return true;
+	return false; 
+}
 
-void	Channel::removeOperator(const std::string& username) {
-	std::vector<std::string>::iterator it = std::find(_operators.begin(), _operators.end(), username);
+void	Channel::addOperator(const std::string& nickname) { _operators.push_back(nickname); }
+
+void	Channel::removeOperator(const std::string& nickname) {
+	std::vector<std::string>::iterator it = std::find(_operators.begin(), _operators.end(), nickname);
 	if (it != _operators.end())
 		_operators.erase(it);
 }
 
-bool	Channel::isOperator(std::string const & username) const {
-	std::vector<std::string>::const_iterator it = std::find(_operators.begin(), _operators.end(), username);
+bool	Channel::isOperator(std::string const & nickname) const {
+	std::vector<std::string>::const_iterator it = std::find(_operators.begin(), _operators.end(), nickname);
 	if (it != _operators.end())
 		return (true);
 	return (false);
 }
 
-void	Channel::broadcastMessageOnChannel(const std::string& message) {
+void	Channel::broadcastMessageOnChannel(const std::string& message, User &sender) {
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
-		if (send(user->getFD(), message.c_str(), message.size(), 0))
-			std::cerr << "ERROR: send call failed" << std::endl;
+		if (user->getNickname() != sender.getNickname()) {
+			if (send(user->getFD(), message.c_str(), message.size(), 0))
+				std::cerr << "ERROR: send call failed" << std::endl;
+		}
 	}
 }

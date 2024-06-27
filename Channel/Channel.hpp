@@ -35,12 +35,13 @@ public:
 	
 	User*						getUserByNickname(const std::string& nickname);
 	const std::vector<User*>&	getUsers(void) const;
+	bool						isUserOnChannel(const std::string &nickname);
 
-	void						addOperator(const std::string& username);
-	void						removeOperator(const std::string& username);
-	bool						isOperator(std::string const & username) const;
+	void						addOperator(const std::string& nickname);
+	void						removeOperator(const std::string& nickname);
+	bool						isOperator(std::string const & nickname) const;
 	
-	void						broadcastMessageOnChannel(const std::string& message);
+	void						broadcastMessageOnChannel(const std::string& message, User &sender);
 	
 private:
 

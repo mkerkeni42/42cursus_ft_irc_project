@@ -6,7 +6,7 @@
 static void	sendResponse(User &user, std::vector<std::string> &channels, ChannelServ &_channelServ, size_t i) {
 	std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost JOIN #" + channels[i] + "\r\n";
 	user.broadcastMessageToHimself(response);
-	_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response);
+	_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response, user);
 	if (_channelServ.getChannel(channels[i])->getTopic() != "") {
 		std::ostringstream	topicMsg;
 		topicMsg << ":irc.myyamin.chat " << RPL_TOPIC << " " << user.getNickname() << " #" << channels[i] << " :" << _channelServ.getChannel(channels[i])->getTopic() << "\r\n";
@@ -73,7 +73,7 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
 		if (!reason.empty())
 			response += " " + reason;
 		response += "\r\n";
-		_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response);
+		_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response, user);
 		user.broadcastMessageToHimself(response);
 	}
 }

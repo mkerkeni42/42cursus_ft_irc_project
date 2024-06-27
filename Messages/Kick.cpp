@@ -29,7 +29,11 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 		if (_channelServ.isUserOnChannel(channel, *troublemaker) == false)
 			throw (UserNotInChannelException((*troublemaker).getUsername(), channel));
 		_channelServ.leaveChannel(channel, *troublemaker);
-		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost KICK #" + channel + " " + nicksToKick[i] + "\r\n";
-		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response);
+		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost KICK #" + channel + " " + nicksToKick[i];
+		if (!message.empty() || message == ":")
+			response += " " + message;
+		response += "\r\n";
+		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
+		user.broadcastMessageToHimself(response);
 	}
 }

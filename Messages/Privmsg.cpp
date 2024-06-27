@@ -20,7 +20,7 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 	if (_channelServ.DoesChannelExist(recipient) == true) {
 		if (_channelServ.isUserOnChannel(recipient, user) == false)
 			throw (NotOnChannelException(recipient));
-		_channelServ.getChannel(recipient)->broadcastMessageOnChannel(message);
+		_channelServ.getChannel(recipient)->broadcastMessageOnChannel(message, user);
 	}
 	else if (_userServ.isNicknameInUse(recipient) == true) {
 		message = ":" + user.getNickname() + "PRIVMSG " + recipient + " :" + message;

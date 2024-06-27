@@ -21,7 +21,7 @@ void	ChannelServ::createChannel(const std::string & channelName, User & user) {
 	
 	newChannel.setName(channelName);
 	newChannel.addUser(user);
-	newChannel.addOperator(user.getUsername());
+	newChannel.addOperator(user.getNickname());
 	_channels[channelName] = newChannel;
 }
 
@@ -43,7 +43,7 @@ void	ChannelServ::broadcastMessageToChannels(const std::string& message, User& s
 	std::map<std::string, Channel>::iterator	it;
 	for (it = _channels.begin(); it != _channels.end(); ++it) {
 		if (this->isUserOnChannel(it->first, sender) == true) {
-			it->second.broadcastMessageOnChannel(message);
+			it->second.broadcastMessageOnChannel(message, sender);
 		}
 	}
 }
@@ -65,13 +65,19 @@ bool	ChannelServ::DoesChannelExist(const std::string & channelName) {
 bool	ChannelServ::isUserOnChannel(std::string const & channelName, User & user) {
 	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
 	if (it != _channels.end()) {
-		std::vector<User*> users = it->second.getUsers();
+		Channel channel = it->second;
+	std::cout << "before checking if user is on channel\n";
+		if (channel.isUserOnChannel(user.getNickname()) == true) {
+			std::cout << "USer is on channel\n";
+			return (true);
+		}
+		/*std::vector<User*> users = it->second.getUsers();
 		std::vector<User*>::iterator userIt;
 		for (userIt = users.begin(); userIt != users.end(); ++userIt) {
         	if (*userIt == &user) {
             	return true;
         	}
-    	}
+    	}*/
 	}
 	return (false);
 }
