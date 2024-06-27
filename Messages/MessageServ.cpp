@@ -70,8 +70,6 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
     } else if (subCommand == "END") {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " END\r\n";
         user.broadcastMessageToHimself(response);
-		response = ":irc.myyamin.chat You need to authenticate to connect to the server\r\n";
-   		user.broadcastMessageToHimself(response);
     } else {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
         user.broadcastMessageToHimself(response);
@@ -164,4 +162,26 @@ void	MessageServ::handlePingCommand(std::string & command, User & user) {
 		throw (NeedMoreParamsException("PING"));
 	std::string response = "PONG irc.myyamin.chat :" + token + "\r\n";
     user.broadcastMessageToHimself(response);
+}
+
+void	MessageServ::getList(std::string const &	arg, std::vector<std::string> &list, int x) {
+	if (arg.find(",") != std::string::npos) {
+		std::stringstream ss(arg);
+    	std::string item;
+    	while (std::getline(ss, item, ',')) {
+			if (!item.empty() && item[0] == '#')
+            	item.erase(0, 1);
+			else if (x == 1)
+				throw (NoSuchChannelException(item));
+			list.push_back(item);
+   		}
+	}
+	else {
+		if (!arg.empty() && arg[0] == '#')
+			list.push_back(arg.substr(1));
+		else if (x == 0)
+			list.push_back(arg);
+		else
+			throw (NoSuchChannelException(arg));
+	}
 }

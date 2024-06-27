@@ -18,6 +18,7 @@ public:
 	typedef void (MessageServ::*CommandHandler)(std::string & command, User & user);
 
     void	handleCommand(std::string & command, User& user);
+    void	getList(std::string const &	arg, std::vector<std::string> &list, int x);
 
 private:
 

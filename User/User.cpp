@@ -60,12 +60,24 @@ int User::receiveData() {
 }
 
 bool User::hasBufferedCommand() const {
-    return _buffer.find("\r\n") != std::string::npos;
+    return _buffer.find("\n") != std::string::npos;
 }
 
 std::string User::getBufferedCommand() {
-    size_t pos = _buffer.find("\r\n");
+    size_t  pos;
+    int     x = 0;
+    
+    pos = _buffer.find("\r\n");
+    if (pos != std::string::npos)
+        x = 2;
+    else {
+        pos = _buffer.find("\n");
+        if (pos != std::string::npos)
+            x = 1;
+        else
+            return ("");
+    }
     std::string command = _buffer.substr(0, pos);
-    _buffer.erase(0, pos + 2);
+    _buffer.erase(0, pos + x);
     return command;
 }

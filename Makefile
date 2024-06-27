@@ -45,11 +45,12 @@ CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -pedantic -fsanitize=address -g3
 
 NAME = ircserv
 
-all: $(NAME)
+all: 
+	@echo ""
+	@echo " $(BOLD)$(PINK)$(UNDERLINE)Compiling...$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳"
+	@$(MAKE) --silent $(NAME)
 
 $(NAME): $(OBJ)
-	@echo ""
-	@echo "	$(BOLD)$(PINK)$(UNDERLINE)Compiling...$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳"
 	@$(CXX) $(CXXFLAGS) -o $(NAME) $^
 	@echo ""
 	@echo "	$(YELLOW)$(BOLD)Compiled ! ✨$(DEF)"

@@ -21,11 +21,19 @@ void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	if (channelObj->getTopicMode() == CHANOP_ONLY && channelObj->isOperator(user.getUsername()) == false)
 		throw (ChanOPrivsNeededException(channel));
 	if (topic.empty()) {
-		std::cout << "Topic for #" << channel << ": " << channelObj->getTopic() << std::endl;
-	// maybe with broadcast message ?
+		std::ostringstream	topicMsg;
+		topicMsg << ":irc.myyamin.chat " << RPL_TOPIC << " " << user.getNickname() << " #" << channel << " :" << _channelServ.getChannel(channel)->getTopic() << "\r\n";
+		std::string	response = topicMsg.str();
+		user.broadcastMessageToHimself(response);
+		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response);
+	}
+	else if (topic == "::") {
+		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost TOPIC #" + channel + " :\r\n";
+		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response);
 	}
 	else {
 		channelObj->setTopic(topic);
-		//std::cout << user.getUsername() << " changed the topic of #" << channel << " to " << message << std::endl;
+		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost TOPIC #" + channel + " " + topic + "\r\n";
+		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response);
 	}
 }

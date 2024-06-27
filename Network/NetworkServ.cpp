@@ -33,6 +33,8 @@ NetworkServ::NetworkServ(int port, std::string& password) : _userServ(password, 
     // Add the server socket to the pollfd structure
     struct pollfd pfd = { _serverFd, POLLIN, 0 };
     _fds.push_back(pfd);
+
+    // need to find a way to check if user tries to connect without a password
 }
 
 void NetworkServ::run() {
@@ -76,9 +78,6 @@ void NetworkServ::acceptNewConnection() {
     // Add the user to the _UserServ
     _userServ.addUser(clientFd);
     std::ostringstream message;
-    //message << ":irc.myyamin.chat " << RPL_WELCOME << " " << _userServ.getNickname(clientFd) << " Welcome to the irc Network, " << _userServ.getNickname(clientFd) << "!" << _userServ.getUsername(clientFd) <<  "@localhost\r\n";
-   // std::string response = message.str();
-   // send(clientFd, response.c_str(), response.size(), 0);
 }
 
 void NetworkServ::handleClientActivity(struct pollfd &pfd) {
