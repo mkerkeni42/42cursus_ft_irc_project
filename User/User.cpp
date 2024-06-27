@@ -3,28 +3,26 @@
 
 User::User(void) {}
 
-User::User(int fd) : _fd(fd), _username("*"), _joinedChanNb(0) {}
+User::User(int fd) : _fd(fd), _registered(false), _username("*"), _nickname("*"), _joinedChanNb(0) {}
 
 User::~User(void) {}
 
 int	User::getFD(void) const { return (this->_fd); }
 
-std::string	User::getPassword(void) const { return (this->_password); }
+bool	User::getRegistrationStatus(void) const { return (this->_registered); }
 
 std::string	User::getUsername(void) const { return (this->_username); }
 
 std::string	User::getNickname(void) const { return (this->_nickname); }
 
-int	User::getMode(void) const { return (this->_mode); }
-
 int	User::getJoinedChanNb(void) const { return (this->_joinedChanNb); }
 
-void	User::setPassword(std::string const & password) { this->_password = password; }
+void	User::setRegistrationStatus(bool status) { this->_registered = status; }
 
 void	User::setUsername(std::string const & username) { this->_username = username; }
 
 void	User::setNickname(std::string const & nickname, UserServ & userServ) {
-    if (getNickname().empty()) {
+    if (getNickname() == "*") {
        this->_nickname = nickname;
        userServ.addUserByNickname(nickname, this);
        return;
@@ -35,7 +33,7 @@ void	User::setNickname(std::string const & nickname, UserServ & userServ) {
     
 }
 
-void	User::setMode(int const & mode) { this->_mode = mode; }
+void	User::setRealname(std::string const & realname) { this->_realname = realname; }
 
 void    User::incJoinedChanNb(void) { this->_joinedChanNb++; }
 

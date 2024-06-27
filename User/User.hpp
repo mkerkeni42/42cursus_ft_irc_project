@@ -15,16 +15,15 @@ public:
 	~User(void);
 
 	int			getFD(void) const;
-	std::string	getPassword(void) const;
+	bool		getRegistrationStatus(void) const;
 	std::string	getUsername(void) const;
 	std::string	getNickname(void) const;
-	int			getMode(void) const;
 	int			getJoinedChanNb(void) const;
 	
-	void		setPassword(std::string const & password);
+	void		setRegistrationStatus(bool status);
 	void		setUsername(std::string const & username);
 	void		setNickname(std::string const & nickname, UserServ & userServ);
-	void		setMode(int const & mode);
+	void		setRealname(std::string const & mode);
 	
 	void		incJoinedChanNb(void);
 	void		decJoinedChanNb(void);
@@ -37,10 +36,10 @@ public:
 private:
 
 	int			_fd;
-	std::string	_password;
+	bool		_registered;
 	std::string	_buffer;
 	std::string	_username;
 	std::string	_nickname;
-	int			_mode;
+	std::string	_realname;
 	int			_joinedChanNb;
 };
