@@ -27,7 +27,7 @@ void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	channelObj->setInvitedUsers((*guest).getUsername());
 	//std::string	message = user.getNickname() + " invites you to join channel #" + channel; // check server format for this message
 	std::ostringstream	message;
-	message << ":irc.myyamin.chat " << RPL_INVITING << " " << user.getUsername() << guest->getNickname() << channel << "\r\n";
+	message << ":irc.myyamin.chat " << RPL_INVITING << " " << user.getUsername() << " " << guest->getNickname() << " " << channel << "\r\n";
 	std::string	response = message.str();
 	_userServ.broadcastPrivateMessage(response.c_str(), nickname);
 	// need to handle multiple channels in one INVITE command

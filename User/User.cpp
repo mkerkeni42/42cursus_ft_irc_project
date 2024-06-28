@@ -25,7 +25,6 @@ void	User::setNickname(std::string const & nickname, UserServ & userServ) {
     if (getNickname() == "*") {
        this->_nickname = nickname;
        userServ.addUserByNickname(nickname, this);
-       // update channels user lists with new nickname
        return;
     }
     std::string    oldNickname = this->_nickname;

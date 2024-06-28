@@ -55,6 +55,9 @@ Channel*	ChannelServ::getChannel(const std::string& channelName) {
 	return NULL;
 }
 
+
+std::map<std::string, Channel>	&ChannelServ::getChannelsList() { return (_channels);}
+
 bool	ChannelServ::DoesChannelExist(const std::string & channelName) {
 	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
 	if (it == _channels.end())
@@ -66,11 +69,8 @@ bool	ChannelServ::isUserOnChannel(std::string const & channelName, User & user) 
 	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
 	if (it != _channels.end()) {
 		Channel channel = it->second;
-	std::cout << "before checking if user is on channel\n";
-		if (channel.isUserOnChannel(user.getNickname()) == true) {
-			std::cout << "USer is on channel\n";
+		if (channel.isUserOnChannel(user.getNickname()) == true)
 			return (true);
-		}
 		/*std::vector<User*> users = it->second.getUsers();
 		std::vector<User*>::iterator userIt;
 		for (userIt = users.begin(); userIt != users.end(); ++userIt) {

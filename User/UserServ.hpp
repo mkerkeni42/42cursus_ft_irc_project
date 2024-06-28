@@ -17,22 +17,22 @@ public:
 	UserServ(std::string & password, NetworkServ &networkServ);
 	~UserServ(void);
 	
-	void	addUser(int fd);
-	void	addUserByNickname(std::string const & nickname, User* user);
-	void	removeUser(int fd);
+	void		addUser(int fd);
+	void		addUserByNickname(std::string const & nickname, User* user);
+	void		removeUser(int fd);
 	
-	int		handleUserActivity(int fd);
-	void	broadcastPrivateMessage(const std::string& message, std::string& recipient);
+	int			handleUserActivity(int fd);
+	void		broadcastPrivateMessage(const std::string& message, std::string& recipient);
 	
-	User	*getUserByNickname(std::string const & nickname);
+	User		*getUserByNickname(std::string const & nickname);
 	std::string	getPassword() const;
 	std::string	getUsername(int fd);
 	std::string	getNickname(int fd);
 	void		removeUserfromNetwork(int fd);
-	void	updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user);
+	void		updateUserNicknameMap(std::string const & oldNickname, std::string const & newNickname, User* user);
 	
-	bool 	isUserRegistered(const std::string & username);
-	bool 	isNicknameInUse(const std::string & nickname);
+	bool 		isUserRegistered(const std::string & username);
+	bool 		isNicknameInUse(const std::string & nickname);
 
 private:
 	

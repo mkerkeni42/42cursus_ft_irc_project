@@ -24,6 +24,8 @@ public:
 	void						setMaxUsersPerChannel(size_t nb);
 	void						setInvitedUsers(const std::string& username);
 	
+	void						updateNicknameMap(User *user, std::string &oldNickname);
+	
 	std::string					getName(void) const;
 	std::string					getTopic(void) const;
 	std::string					getPassword(void) const;
@@ -32,6 +34,7 @@ public:
 	int							getPasswordMode(void) const;
 	size_t						getMaxUsersPerChannel(void) const;
 	std::vector<std::string>	getInvitedUsers(void) const;
+	const std::map<std::string, User*> &	getNicknameMap(void) const;
 	
 	User*						getUserByNickname(const std::string& nickname);
 	const std::vector<User*>&	getUsers(void) const;
@@ -53,7 +56,7 @@ private:
 	int								_topicMode;
 	size_t							_maxUsersPerChannel;
 	std::vector<User*>				_users;
-	std::map<std::string, User*>	_userMap;
+	std::map<std::string, User*>	_nicknameMap;
 	std::vector<std::string>		_operators;
 	std::vector<std::string>		_invitedUsers;
 };

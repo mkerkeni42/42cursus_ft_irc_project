@@ -114,7 +114,16 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
         throw (NicknameInUseException(user.getUsername(), nickname));
 	}
 	std::string message = ":" + user.getNickname() + " NICK " + nickname + "\r\n";
+	std::string	oldNickname = user.getNickname();
 	user.setNickname(nickname, _userServ);
+	std::map<std::string, Channel> &channels = _channelServ.getChannelsList();
+	std::map<std::string, Channel>::iterator	it;
+	for (it = channels.begin(); it != channels.end(); ++it) {
+		Channel	&channel = it->second;
+		if (channel.isUserOnChannel(oldNickname) == true) {
+			channel.updateNicknameMap(&user, oldNickname);
+		}
+	}
 	user.broadcastMessageToHimself(message);
 	_channelServ.broadcastMessageToChannels(message, user);
 }

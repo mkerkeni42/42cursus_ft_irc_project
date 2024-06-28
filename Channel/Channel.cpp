@@ -7,12 +7,12 @@ Channel::~Channel() {}
 
 void	Channel::addUser(User & user) {
 	_users.push_back(&user);
-	_userMap[user.getNickname()] = &user;
+	_nicknameMap[user.getNickname()] = &user;
 }
 
 void	Channel::removeUser(User& user) {
 	_users.erase(std::remove(_users.begin(), _users.end(), &user), _users.end());
-	_userMap.erase(user.getNickname());
+	_nicknameMap.erase(user.getNickname());
 }
 
 void	Channel::setName(const std::string& name) { _name = name; }
@@ -47,9 +47,11 @@ size_t	Channel::getMaxUsersPerChannel(void) const { return (_maxUsersPerChannel)
 
 std::vector<std::string>	Channel::getInvitedUsers(void) const { return (_invitedUsers); }	
 
+const std::map<std::string, User*> &	Channel::getNicknameMap(void) const { return (_nicknameMap); }
+
 User*	Channel::getUserByNickname(const std::string& nickname) {
-	std::map<std::string, User*>::iterator	it = _userMap.find(nickname);
-	if (it != _userMap.end())
+	std::map<std::string, User*>::iterator	it = _nicknameMap.find(nickname);
+	if (it != _nicknameMap.end())
 		return it->second;
 	return NULL;
 }
@@ -57,9 +59,8 @@ User*	Channel::getUserByNickname(const std::string& nickname) {
 const std::vector<User*>&	Channel::getUsers() const { return _users; }
 
 bool	Channel::isUserOnChannel(const std::string &nickname) {
-	std::map<std::string, User*>::iterator	it = _userMap.find(nickname);
-	std::cout << "nickname = " << nickname << std::endl;
-	if (it != _userMap.end())
+	std::map<std::string, User*>::iterator	it = _nicknameMap.find(nickname);
+	if (it != _nicknameMap.end())
 		return true;
 	return false; 
 }
@@ -87,4 +88,10 @@ void	Channel::broadcastMessageOnChannel(const std::string& message, User &sender
 				std::cerr << "ERROR: send call failed" << std::endl;
 		}
 	}
+}
+
+void	Channel::updateNicknameMap(User *user, std::string & oldNickname) {
+	std::cout << 
+	_nicknameMap.erase(oldNickname);
+	_nicknameMap[user->getNickname()] = user;
 }
