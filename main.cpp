@@ -4,26 +4,51 @@
 #include "User/UserServ.hpp"
 #include "Messages/MessageServ.hpp"
 
+bool	check_port_availability(int port) {
+	int	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) {
+		std::cerr << RED << "ERROR: socket creation failedq!" << std::endl;
+		return (false);
+	}
+	struct sockaddr_in	addr;
+	std::memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = htons(port);
+
+	int result = bind(sockfd, (struct sockaddr *)&addr, sizeof(addr));
+	close(sockfd);
+
+	if (result < 0) {
+		std::cerr << RED << "ERROR: port " << port << " is unavailable!" << std::endl;
+		return (false);
+	}
+	return (true);
+}
+
 bool	check_port(char *arg) {
 	std::string	value = static_cast<std::string>(arg);
 	if (value.length() > 5) {
-		std::cerr << RED << "ERROR: wrong port number !" << std::endl;
+		std::cerr << RED << "ERROR: wrong port number!" << std::endl;
 		return (false);
 	}
 	for (size_t i = 0; i < value.length(); i++) {
 		if (!isdigit(value[i])) {
-			std::cerr << RED << "ERROR: wrong port number !" << std::endl;
+			std::cerr << RED << "ERROR: wrong port number!" << std::endl;
 			return (false);
 		}
 	}
 	int	nb = std::atoi(value.c_str());
-	if (nb > 65535) {
-		std::cerr << RED << "ERROR: wrong port number !" << std::endl;
+	if (nb < 1024 || nb > 65535) {
+		std::cerr << RED << "ERROR: wrong port number!" << std::endl;
 		return (false);
 	}
-	//maybe try to open port here
+	if (!check_port_availability(nb)) {
+		return (false);
+	}
 	return (true);
 }
+
 
 bool	check_password(char* arg) {
 	std::string	entered_password = arg;
