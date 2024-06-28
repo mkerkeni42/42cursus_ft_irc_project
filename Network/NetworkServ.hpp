@@ -6,20 +6,21 @@
 #include "../User/UserServ.hpp"
 
 
-class    NetworkServ {
-    public:
-        NetworkServ(int port, std::string& password);
-        // maybe need to define a destructor in order to close all fds if server is closed before all clients quit 
-        void    run();
-        void    removeClient(int fd);
-    private:
-        void    acceptNewConnection();
-        void    handleClientActivity(struct pollfd& pfd);
+class	NetworkServ {
+	public:
+		NetworkServ(int port, std::string& password);
+		~NetworkServ();
+		void	run();
+		void	shutdown();
+		void	removeClient(int fd);
+	private:
+		void	acceptNewConnection();
+		void	handleClientActivity(struct pollfd& pfd);
 
-        int                             _serverFd;
-        std::vector<struct pollfd>      _fds;
-        std::map<int, struct pollfd>    _fdMap;
-        UserServ                        _userServ;
+		int								_serverFd;
+		std::vector<struct pollfd>		_fds;
+		std::map<int, struct pollfd>	_fdMap;
+		UserServ						_userServ;
 };
 
 #endif
