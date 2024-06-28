@@ -3,6 +3,7 @@
 #include "User/User.hpp"
 #include "User/UserServ.hpp"
 #include "Messages/MessageServ.hpp"
+#include <csignal>
 
 bool	check_port_availability(int port) {
 	int	sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -64,19 +65,37 @@ bool	check_password(char* arg) {
 	return (true);
 }
 
+
+NetworkServ* server = nullptr;
+
+void handleSignal(int signal) {
+	if (server) {
+		server->shutdown();
+	}
+	exit(signal);
+}
+
 int	main(int ac, char **av) {
 	if (ac != 3) {
 		std::cerr << RED << "Usage: " << av[0] << " <port> <password>" << std::endl;
-		return (1);
+		return 1;
 	}
 	if (check_port(av[1]) == false)
 		return (1);
 	if (check_password(av[2]) == false)
 		return (1);
 	std::string	port = av[1];
-	int portNb = std::atoi(port.c_str());
-    std::string password = av[2];
-	NetworkServ server(portNb, password);
-	server.run();
+	int			portNb = std::atoi(port.c_str());
+	std::string	password = av[2];
+
+	server = new NetworkServ(portNb, password);
+
+	// Setup signal handlers
+	std::signal(SIGINT, handleSignal);
+	std::signal(SIGTERM, handleSignal);
+
+	server->run();
+
+	delete (server);
 	return (0);
 }

@@ -111,3 +111,27 @@ void	NetworkServ::removeClient(int fd) {
 	// Remove the user from the _UserServ
 	//_userServ.removeUser(fd);
 }
+
+NetworkServ::~NetworkServ() {
+	// Close all file descriptors
+	for (size_t i = 0; i < _fds.size(); ++i) {
+		close(_fds[i].fd);
+	}
+}
+
+void	NetworkServ::shutdown() {
+	// Close all client connections
+	for (size_t i = 0; i < _fds.size(); ++i) {
+		if (_fds[i].fd != _serverFd) {
+			close(_fds[i].fd);
+		}
+	}
+	// Close the server socket
+	close(_serverFd);
+
+	// Clear the file descriptor list and map
+	_fds.clear();
+	_fdMap.clear();
+}
+
+
