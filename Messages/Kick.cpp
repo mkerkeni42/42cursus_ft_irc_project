@@ -18,7 +18,7 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 	if (_channelServ.isUserOnChannel(channel, user) == false)
 		throw (NotOnChannelException(channel));
 	Channel	*channelObj = _channelServ.getChannel(channel);
-	if (channelObj->isOperator(user.getUsername()) == false)
+	if (channelObj->isOperator(user.getNickname()) == false)
 		throw (ChanOPrivsNeededException(channel));
 	std::vector<std::string>	nicksToKick;
 	getList(nickname, nicksToKick, 0);
@@ -27,13 +27,15 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 			throw (NoSuchNickException(nicksToKick[i]));
 		User	*troublemaker = _userServ.getUserByNickname(nicksToKick[i]);
 		if (_channelServ.isUserOnChannel(channel, *troublemaker) == false)
-			throw (UserNotInChannelException((*troublemaker).getUsername(), channel));
+			throw (UserNotInChannelException((*troublemaker).getNickname(), channel));
 		_channelServ.leaveChannel(channel, *troublemaker);
-		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost KICK #" + channel + " " + nicksToKick[i];
+		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost KICK #" + channel + " " + troublemaker->getNickname();
 		if (!message.empty() || message == ":")
 			response += " " + message;
 		response += "\r\n";
-		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
+		std::cout << response;
 		user.broadcastMessageToHimself(response);
+		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
+        troublemaker->broadcastMessageToHimself(message);
 	}
 }

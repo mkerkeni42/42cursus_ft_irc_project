@@ -66,7 +66,7 @@ bool	check_password(char* arg) {
 }
 
 
-NetworkServ* server = nullptr;
+NetworkServ* server = NULL;
 
 void handleSignal(int signal) {
 	if (server) {

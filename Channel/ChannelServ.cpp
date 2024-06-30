@@ -11,7 +11,7 @@ void	ChannelServ::joinChannel(const std::string& channelName, User & user) {
 
 void	ChannelServ::leaveChannel(const std::string& channelName, User & user) {
 	_channels[channelName].removeUser(user);
-	_channels[channelName].removeOperator(user.getUsername());
+	_channels[channelName].removeOperator(user.getNickname());
 	if (_channels.empty())
 		deleteChannel(channelName);
 }

@@ -19,6 +19,8 @@ B3 = \033[0;94m
 B4 = \033[1;34m
 B5 = \033[38;5;39m
 
+BACKGREEN = \033[45m
+
 #------------------------------------SRCS-------------------------------------#
 
 SRC = 	main.cpp \
@@ -45,11 +47,11 @@ CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -pedantic -fsanitize=address -g3
 
 .cpp.o:
-	@printf "	$(BOLD)$(PINK)$(UNDERLINE)Compiling.$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳  \r"
-	@sleep 0.2
-	@printf "	$(BOLD)$(PINK)$(UNDERLINE)Compiling..$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳\r"
-	@sleep 0.2
-	@printf "	$(BOLD)$(PINK)$(UNDERLINE)Compiling...$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⌛\r"
+	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling.$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳  \r"
+	@sleep 0.18
+	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling..$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳\r"
+	@sleep 0.18
+	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling...$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⌛\r"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 #------------------------------------RULES------------------------------------#
@@ -62,14 +64,18 @@ $(NAME): $(OBJ)
 	@echo ""
 	@$(CXX) $(CXXFLAGS) -o $(NAME) $^
 	@echo ""
-	@echo "	$(YELLOW)$(BOLD)Compiled ! ✨$(DEF)"
-	@echo "\n$(B1):::::::::: :::::::::::           ::::::::::: :::::::::   ::::::::$(DEF)"
-	@echo "$(B2):+:            :+:                   :+:     :+:    :+: :+:    :+:$(DEF)"
-	@echo "$(B3)+:+            +:+                   +:+     +:+    +:+ +:+        $(DEF)"
-	@echo "$(B4):#::+::#       +#+                   +#+     +#++:++#:  +#+        $(DEF)"
-	@echo "$(B4)+#+            +#+                   +#+     +#+		$(DEF)"
-	@echo "$(B5)#+#            #+#                   #+#     #+#    #+# #+#    #+# $(DEF)"
-	@echo "$(B5)###            ###    ########## ########### ###    ###  ######## $(DEF)"
+	@echo "    $(YELLOW)$(BOLD)Compiled ! ✨$(DEF)"
+	@echo "\n$(B2)         _        _                         _          _            _      $(DEF)"
+	@echo "$(B2)        /\ \     /\ \                      /\ \       /\ \        /\ \     $(DEF)"
+	@echo "$(B2)       /  \ \    \_\ \                     \ \ \     /  \ \      /  \ \    $(DEF)"
+	@echo "$(B2)      / /\ \ \   /\__ \                    /\ \_\   / /\ \ \    / /\ \ \   $(DEF)"
+	@echo "$(B2)     / / /\ \_\ / /_ \ \                  / /\/_/  / / /\ \_\  / / /\ \ \  $(DEF)"
+	@echo "$(B2)    / /_/_ \/_// / /\ \ \                / / /    / / /_/ / / / / /  \ \_\ $(DEF)"
+	@echo "$(B2)   / /____/\  / / /  \/_/               / / /    / / /__\/ / / / /    \/_/ $(DEF)"
+	@echo "$(B2)  / /\____\/ / / /   ___________       / / /    / / /_____/ / / /          $(DEF)"
+	@echo "$(B2) / / /      / / /___/__________/\  ___/ / /__  / / /\ \ \  / / /________   $(DEF)"
+	@echo "$(B2)/ / /      /_/ //__________    \ \/\__\/_/___\/ / /  \ \ \/ / /_________\  $(DEF)"
+	@echo "$(B2)\/_/       \_\/ \____\/    \____\/\/_________/\/_/    \_\/\/____________/  $(DEF)"
 
 clean:
 	@rm -f $(OBJ)
