@@ -22,7 +22,6 @@ public:
 	void						setTopicMode(const int & newMode);
 	void						setPasswordMode(const int & newMode);
 	void						setMaxUsersPerChannel(size_t nb);
-	void						setInvitedUsers(const std::string& username);
 	
 	void						updateNicknameMap(User *user, std::string &oldNickname);
 	
@@ -44,6 +43,14 @@ public:
 	void						removeOperator(const std::string& nickname);
 	bool						isOperator(std::string const & nickname) const;
 	
+	void						addInvitedUser(const std::string& nickname);
+	void						removeInvitedUser(const std::string& nickname);
+	bool						isInvited(std::string const & nickname) const;
+	
+	void						addMode(char newMode);
+	void						deleteMode(char mode);
+	std::string					getModes(void) const;
+
 	void						broadcastMessageOnChannel(const std::string& message, User &sender);
 	
 private:
@@ -52,6 +59,7 @@ private:
 	std::string						_topic;
 	std::string						_password;
 	int								_mode;
+	//std::vector<char>				_modes;
 	int								_passwordMode;
 	int								_topicMode;
 	size_t							_maxUsersPerChannel;

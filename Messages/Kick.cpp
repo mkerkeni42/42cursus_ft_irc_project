@@ -11,23 +11,23 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
     iss >> cmd >> channel >> nickname >> std::ws;
 	std::getline(iss, message);
 	if (channel.empty() || channel[0] != '#' || nickname.empty())
-		throw (NeedMoreParamsException(cmd));
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
 	channel = channel.substr(1);
 	if (_channelServ.DoesChannelExist(channel) == false)
-		throw (NoSuchChannelException(channel));
+		throw (NoSuchChannelException(user.getNickname(), channel));
 	if (_channelServ.isUserOnChannel(channel, user) == false)
-		throw (NotOnChannelException(channel));
+		throw (NotOnChannelException(user.getNickname(), channel));
 	Channel	*channelObj = _channelServ.getChannel(channel);
 	if (channelObj->isOperator(user.getNickname()) == false)
-		throw (ChanOPrivsNeededException(channel));
+		throw (ChanOPrivsNeededException(user.getNickname(), channel));
 	std::vector<std::string>	nicksToKick;
-	getList(nickname, nicksToKick, 0);
+	getList(nickname, nicksToKick, 0, user);
 	for (size_t i = 0; i < nicksToKick.size(); i++) {
 		if (_userServ.isNicknameInUse(nicksToKick[i]) == false)
-			throw (NoSuchNickException(nicksToKick[i]));
+			throw (NoSuchNickException(user.getNickname(), nicksToKick[i]));
 		User	*troublemaker = _userServ.getUserByNickname(nicksToKick[i]);
 		if (_channelServ.isUserOnChannel(channel, *troublemaker) == false)
-			throw (UserNotInChannelException((*troublemaker).getNickname(), channel));
+			throw (UserNotInChannelException(user.getNickname(), (*troublemaker).getNickname(), channel));
 		_channelServ.leaveChannel(channel, *troublemaker);
 		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost KICK #" + channel + " " + troublemaker->getNickname();
 		if (!message.empty() || message == ":")

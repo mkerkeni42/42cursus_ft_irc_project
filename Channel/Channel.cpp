@@ -29,8 +29,6 @@ void	Channel::setPasswordMode(const int & newMode) { _passwordMode = newMode; }
 
 void	Channel::setMaxUsersPerChannel(size_t nb) { _maxUsersPerChannel = nb; }
 
-void	Channel::setInvitedUsers(const std::string& username) { _invitedUsers.push_back(username); }
-
 std::string	Channel::getName(void) const { return (_name); }
 
 std::string	Channel::getTopic(void) const { return (_topic); }
@@ -80,18 +78,44 @@ bool	Channel::isOperator(std::string const & nickname) const {
 	return (false);
 }
 
+void	Channel::addInvitedUser(const std::string& nickname) { _invitedUsers.push_back(nickname); }
+
+void	Channel::removeInvitedUser(const std::string& nickname) {
+	std::vector<std::string>::iterator it = std::find(_invitedUsers.begin(), _invitedUsers.end(), nickname);
+	if (it != _invitedUsers.end())
+		_invitedUsers.erase(it);
+}
+
+bool	Channel::isInvited(std::string const & nickname) const {
+	std::vector<std::string>::const_iterator it = std::find(_invitedUsers.begin(), _invitedUsers.end(), nickname);
+	if (it != _invitedUsers.end())
+		return (true);
+	return (false);
+}
+
+/*void	Channel::addMode(char newMode) {
+
+}
+
+void	Channel::deleteMode(char mode) {
+	
+}
+
+std::string	Channel::getModes(void) const {
+
+}*/
+
 void	Channel::broadcastMessageOnChannel(const std::string& message, User &sender) {
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
 		if (user->getNickname() != sender.getNickname()) {
-			if (send(user->getFD(), message.c_str(), message.size(), 0))
+			if (send(user->getFD(), message.c_str(), message.size(), 0) == -1)
 				std::cerr << "ERROR: send call failed" << std::endl;
 		}
 	}
 }
 
 void	Channel::updateNicknameMap(User *user, std::string & oldNickname) {
-	std::cout << 
 	_nicknameMap.erase(oldNickname);
 	_nicknameMap[user->getNickname()] = user;
 }

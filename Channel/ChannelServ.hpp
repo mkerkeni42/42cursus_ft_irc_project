@@ -26,7 +26,6 @@ public:
 	bool		DoesChannelExist(const std::string & channelName);
 	bool		isUserOnChannel(std::string const & channelName, User & user);
 	bool		isChannelFull(std::string const & channelName);
-	bool		isUserInvited(std::string const & channelName, User & user);
 	
 private:
 

@@ -12,6 +12,7 @@ void	ChannelServ::joinChannel(const std::string& channelName, User & user) {
 void	ChannelServ::leaveChannel(const std::string& channelName, User & user) {
 	_channels[channelName].removeUser(user);
 	_channels[channelName].removeOperator(user.getNickname());
+	_channels[channelName].removeInvitedUser(user.getNickname());
 	if (_channels.empty())
 		deleteChannel(channelName);
 }
@@ -71,13 +72,6 @@ bool	ChannelServ::isUserOnChannel(std::string const & channelName, User & user) 
 		Channel channel = it->second;
 		if (channel.isUserOnChannel(user.getNickname()) == true)
 			return (true);
-		/*std::vector<User*> users = it->second.getUsers();
-		std::vector<User*>::iterator userIt;
-		for (userIt = users.begin(); userIt != users.end(); ++userIt) {
-        	if (*userIt == &user) {
-            	return true;
-        	}
-    	}*/
 	}
 	return (false);
 }
@@ -90,16 +84,4 @@ bool	ChannelServ::isChannelFull(std::string const & channelName) {
 	if (channel.getMaxUsersPerChannel() != 0 && users.size() == channel.getMaxUsersPerChannel())
 		return (true);
 	return (false);	
-}
-
-bool	ChannelServ::isUserInvited(std::string const & channelName, User & user) {
-	std::map<std::string, Channel>::iterator	it = _channels.find(channelName);
-	Channel channel = it->second;
-	std::vector<std::string> invitedUsers = channel.getInvitedUsers();
-	std::vector<std::string>::iterator	vecIt;
-	for (vecIt = invitedUsers.begin(); vecIt != invitedUsers.end(); ++vecIt) {
-		if (*vecIt == user.getUsername())
-			return (true);
-	}
-	return (false);
 }

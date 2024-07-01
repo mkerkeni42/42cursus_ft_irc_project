@@ -7,37 +7,65 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 	std::cout << "Handling MODE command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, target, mode, arg;
-    iss >> cmd >> target >> mode >> arg >> std::ws;
-	if (target.empty() || target[0] != '#') {
+    iss >> cmd >> target >> mode;
+	getline(iss, arg);
+	if (target == "*")
+		return;
+	if (target.empty())
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
+	if (mode.empty()) {
+		std::ostringstream	message;
+		message << ":irc.myyamin.chat " << RPL_CHANNELMODEIS << " " << user.getNickname() << " " << target << " " << mode << " " << arg << "\r\n";
+		std::string	response = message.str();
+		std::cout << response;
+		user.broadcastMessageToHimself(response);
 		return;
 	}
-	std::string	channel = target.substr(1);
-	if (mode.empty())
-		throw (NeedMoreParamsException(cmd));
+	
+	std::string	channel;
+	if (target[0] == '#')
+		channel = target.substr(1);
+	else
+		channel = target;
 	if (_channelServ.DoesChannelExist(channel) == false)
-		throw (NoSuchChannelException(channel));
+		throw (NoSuchChannelException(user.getNickname(), channel));
 	if (_channelServ.isUserOnChannel(channel, user) == false)
-		throw (NotOnChannelException(channel));
+		throw (NotOnChannelException(user.getNickname(), channel));
 	Channel	*channelObj = _channelServ.getChannel(channel);
-	if (channelObj->isOperator(user.getUsername()) == false)
-		throw (ChanOPrivsNeededException(channel));
-	if (mode.length() != 2 || (mode[0] != '+' && mode[0] != '-') || (mode[1] != 'i' && mode[1] != 't' \
-		&& mode[1] != 'k' && mode[1] != 'o' && mode[1] != 'l'))
-			throw (UnknownModeException(mode));
-	if (mode[0] == '+')
-		handleSetMode(channelObj, mode[1], arg);
-	else if (mode[0] == '-')
-		handleRemoveMode(channelObj, mode[1], arg);
-	std::string response = ":irc.myyamin.chat MODE " + user.getNickname() + " " + channel + " " + mode;
+	if (channelObj->isOperator(user.getNickname()) == false)
+		throw (ChanOPrivsNeededException(user.getNickname(), target));
+	for (size_t i = 0; i < mode.length(); i++) {
+		if (mode[i] != '+' && mode[i] != '-' && mode[i] != 'i' && mode[i] != 't' \
+		&& mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l')
+			throw (UnknownModeException(user.getNickname(), mode));
+	}
+	std::istringstream	args(arg);
+	int	ret;
+	for (size_t i = 0; i < mode.length(); i++) {
+		if (mode[i] == '+') {
+			while (mode[i] && mode[i] != '-') {
+				ret = handleSetMode(channelObj, mode[i], args, user);
+				i++;
+			}
+		}
+		else if (mode[i] == '-') {
+			while (mode[i] && mode[i] != '+') {
+				handleRemoveMode(channelObj, mode[i], args, user);
+				i++;
+			}
+		}
+	}
+	std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost MODE #" + channel + " " + mode;
 	if (!arg.empty())
 		response += " " + arg;
 	response += "\r\n";
-	std::cout << response << std::endl;
-    user.broadcastMessageToHimself(response);
-	// need to handle multiple options for Mode command like "MODE +iot"
+	if (ret != 1) {
+		channelObj->broadcastMessageOnChannel(response, user);
+		user.broadcastMessageToHimself(response);
+	}
 }
 
-void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string arg) {
+int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istringstream &args, User &user) {
 	switch (mode) {
 		case 'i':
 			channel->setMode(INVITE_ONLY);
@@ -45,40 +73,49 @@ void	MessageServ::handleSetMode(Channel *channel, char const & mode, std::string
 		case 't':
 			channel->setTopicMode(CHANOP_ONLY);
 			break;
-		case 'k':
-			if (channel->getPasswordMode() == ENABLED)
-				throw (KeySetException(channel->getName()));
-			if (arg.empty())
-				throw (NeedMoreParamsException("MODE"));
-			if (arg.length() < 8 || arg.length() > 24) {
-				// throw password exception
-				return;
-			}
+		case 'k': {
+			std::string	key;
+			args >> key;
+			if (key.empty())
+				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+			if (key.empty())
+				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
 			channel->setPasswordMode(ENABLED);
-			channel->setPassword(arg);
+			channel->setPassword(key);
 			channel->setMode(PROTECTED);
 			break;
+		}
 		case 'o': {
-			User *user = _userServ.getUserByNickname(arg);
-			if (_channelServ.isUserOnChannel(channel->getName(), *user) == false)
-				throw (UserNotInChannelException(arg, channel->getName()));
-			channel->addOperator(arg);
+			std::string	nick;
+			args >> nick;
+			if (nick.empty())
+				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+			User *newOp = _userServ.getUserByNickname(nick);
+			if (newOp == NULL)
+				throw (NoSuchNickException(user.getNickname(), nick));
+			if (_channelServ.isUserOnChannel(channel->getName(), *newOp) == false)
+				throw (UserNotInChannelException(user.getNickname(), nick, channel->getName()));
+			channel->addOperator(nick);
 			break;
 		}
 		case 'l': {
-			for (size_t i = 0; i < arg.length(); i++) {
-				if (std::isdigit(arg[i]) == false) {
-					// throw exception for bad characters
-					return;
+			std::string	limit;
+			args >> limit;
+			if (limit.empty())
+				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+			for (size_t i = 0; i < limit.length(); i++) {
+				if (std::isdigit(limit[i]) == false) {
+					return (1);
 				}
 			}
-			channel->setMaxUsersPerChannel(std::atoi(arg.c_str()));
+			channel->setMaxUsersPerChannel(std::atoi(limit.c_str()));
 			break;
 		}
 	}
+	return (0);
 }
 
-void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::string arg) {
+void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::istringstream &args, User& user) {
 	switch (mode) {
 		case 'i':
 			channel->setMode(PUBLIC);
@@ -89,15 +126,19 @@ void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::str
 		case 'k': {
 			channel->setPasswordMode(DISABLED);
 			channel->setMode(PUBLIC);
-			std::string	emptykey = "";
+			std::string	emptykey = "*";
 			channel->setPassword(emptykey);
 			break;
 		}
 		case 'o': {
-			User *user = _userServ.getUserByNickname(arg);
-			if (_channelServ.isUserOnChannel(channel->getName(), *user) == false)
-				throw (UserNotInChannelException(arg, channel->getName()));
-			channel->removeOperator(arg);
+			std::string	nick;
+			args >> nick;
+			if (nick.empty())
+				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+			User *op = _userServ.getUserByNickname(nick);
+			if (_channelServ.isUserOnChannel(channel->getName(), *op) == false)
+				throw (UserNotInChannelException(user.getNickname(), nick, channel->getName()));
+			channel->removeOperator(nick);
 			break;
 		}
 		case 'l':

@@ -4,9 +4,9 @@
 
 class	NoSuchNickException : public std::exception {
 public:
-	NoSuchNickException(const std::string& nick) : _nick(nick) {
+	NoSuchNickException(const std::string &client, const std::string& nick) : _client(client), _nick(nick) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NOSUCHNICK << " " << _nick << " :No such nick/channel\r\n";
+		message << ":irc.myyamin.chat " << ERR_NOSUCHNICK << " " << _client << " " << _nick << " :No such nick/channel\r\n";
 		_message = message.str();
 	}
 	virtual	~NoSuchNickException() throw () {}
@@ -14,15 +14,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_nick;
 	std::string	_message;
 };
 
 class	NoSuchChannelException : public std::exception {
 public:
-	NoSuchChannelException(const std::string& channel) : _channel(channel) {
+	NoSuchChannelException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NOSUCHCHANNEL << " " << _channel << " :No such channel\r\n";
+		message << ":irc.myyamin.chat " << ERR_NOSUCHCHANNEL << " " << _client << " " << _channel << " :No such channel\r\n";
 		_message = message.str();
 	}
 	virtual	~NoSuchChannelException() throw () {}
@@ -30,15 +31,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_channel;
 	std::string	_message;
 };
 
 class	TooManyChannelsException : public std::exception {
 public:
-	TooManyChannelsException(const std::string& channel) : _channel(channel) {
+	TooManyChannelsException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_TOOMANYCHANNELS << " " << _channel << " :You have joined too many channels\r\n";
+		message << ":irc.myyamin.chat " << ERR_TOOMANYCHANNELS << " " << _client << " "<< _channel << " :You have joined too many channels\r\n";
 		_message = message.str();
 	}
 	virtual ~TooManyChannelsException() throw () {}
@@ -46,15 +48,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_channel;
 	std::string	_message;
 };
 
 class	NoTextToSendException : public std::exception {
 public:
-	NoTextToSendException() {
+	NoTextToSendException(const std::string& client) : _client(client) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NOTEXTTOSEND << " :No text to send";
+		message << ":irc.myyamin.chat " << ERR_NOTEXTTOSEND << " " << _client << " :No text to send";
 		_message = message.str();
 	}
 	virtual ~NoTextToSendException() throw () {}
@@ -62,14 +65,15 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_message;
 };
 
 class	UnknownCommandException : public std::exception {
 public:
-	UnknownCommandException(const std::string& command) : _command(command) {
+	UnknownCommandException(const std::string& client, const std::string& command) : _client(client), _command(command) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_UNKNOWNCOMMAND << " " << _command << " :Unknown command\r\n";
+		message << ":irc.myyamin.chat " << ERR_UNKNOWNCOMMAND << " " << _client << " " << _command << " :Unknown command\r\n";
 		_message = message.str();
 	}
 	virtual ~UnknownCommandException() throw () {}
@@ -77,15 +81,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_command;
 	std::string	_message;
 };
 
 class	NoNicknameGivenException : public std::exception {
 public:
-	NoNicknameGivenException() {
+	NoNicknameGivenException(const std::string& client) : _client(client) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NONICKNAMEGIVEN << " :No nickname given\r\n";
+		message << ":irc.myyamin.chat " << ERR_NONICKNAMEGIVEN << " " << _client << " :No nickname given\r\n";
 		_message = message.str();
 	}
 	virtual ~NoNicknameGivenException() throw () {}
@@ -93,14 +98,15 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_message;
 };
 
 class	ErroneusNicknameException : public std::exception {
 public:
-	ErroneusNicknameException(const std::string& nick) : _nick(nick) {
+	ErroneusNicknameException(const std::string& client, const std::string& nick) : _client(client), _nick(nick) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_ERRONEUSNICKNAME <<  " " << _nick << " :Erroneus nickname\r\n";
+		message << ":irc.myyamin.chat " << ERR_ERRONEUSNICKNAME <<  " " << _client << " " << _nick << " :Erroneus nickname\r\n";
 		_message = message.str();
 	}
 	virtual ~ErroneusNicknameException() throw () {}
@@ -108,15 +114,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_nick;
 	std::string	_message;
 };
 
 class	NicknameInUseException : public std::exception {
 public:
-	NicknameInUseException(const std::string& username, const std::string& nick) : _username(username), _nick(nick) {
+	NicknameInUseException(const std::string& client, const std::string& nick) : _client(client), _nick(nick) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NICKNAMEINUSE << " " << _username << " " << _nick << " :Nickname is already in use\r\n";
+		message << ":irc.myyamin.chat " << ERR_NICKNAMEINUSE << " " << _client << " " << _nick << " :Nickname is already in use\r\n";
 		_message = message.str();
 	}
 	virtual ~NicknameInUseException() throw () {}
@@ -124,16 +131,16 @@ public:
 		return (_message.c_str());
 	}
 private:
-	std::string	_username;
+	std::string	_client;
 	std::string	_nick;
 	std::string	_message;
 };
 
 class	UserNotInChannelException : public std::exception {
 public:
-	UserNotInChannelException(const std::string& nick, const std::string& channel) : _nick(nick), _channel(channel) {
+	UserNotInChannelException(const std::string& client, const std::string& nick, const std::string& channel) : _client(client), _nick(nick), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_USERNOTINCHANNEL << " " << _nick << " " << _channel << " :They aren't on that channel\r\n";
+		message << ":irc.myyamin.chat " << ERR_USERNOTINCHANNEL << " " << _client << " " << _nick << " " << _channel << " :They aren't on that channel\r\n";
 		_message = message.str();
 	}
 	virtual ~UserNotInChannelException() throw () {}
@@ -141,6 +148,7 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_nick;
 	std::string	_channel;
 	std::string	_message;
@@ -148,9 +156,9 @@ private:
 
 class	NotOnChannelException : public std::exception {
 public:
-	NotOnChannelException(const std::string& channel) : _channel(channel) {
+	NotOnChannelException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NOTONCHANNEL << " " << _channel << " :You are not on that channel\r\n";
+		message << ":irc.myyamin.chat " << ERR_NOTONCHANNEL << " " << _client << " " << _channel << " :You are not on that channel\r\n";
 		_message = message.str();
 	}
 	virtual ~NotOnChannelException() throw () {}
@@ -158,15 +166,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_channel;
 	std::string	_message;
 };
 
 class	UserOnChannelException : public std::exception {
 public:
-	UserOnChannelException(const std::string& user, const std::string& channel) : _user(user), _channel(channel) {
+	UserOnChannelException(const std::string& client, const std::string& nick, const std::string& channel) : _client(client), _nick(nick), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_USERONCHANNEL << " " << _user << " " << _channel << " :Is already on channel\r\n";
+		message << ":irc.myyamin.chat " << ERR_USERONCHANNEL << " " << _client << " " << _nick << " " << _channel << " :Is already on channel\r\n";
 		_message = message.str();
 	}
 	virtual ~UserOnChannelException() throw () {}
@@ -174,16 +183,17 @@ public:
 		return (_message.c_str());
 	}
 private:
-	std::string	_user;
+	std::string _client;
+	std::string	_nick;
 	std::string	_channel;
 	std::string	_message;
 };
 
 class	NotRegisteredException : public std::exception {
 public:
-	NotRegisteredException() {
+	NotRegisteredException(const std::string& client) : _client(client) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NOTREGISTERED << " :You have not registered\r\n";
+		message << ":irc.myyamin.chat " << ERR_NOTREGISTERED << " " << _client << " :You have not registered\r\n";
 		_message = message.str();
 	}
 	virtual ~NotRegisteredException() throw () {}
@@ -191,14 +201,15 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_message;
 };
 
 class	AlreadyRegisteredException : public std::exception {
 public:
-	AlreadyRegisteredException() {
+	AlreadyRegisteredException(const std::string& client) : _client(client) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_ALREADYREGISTERED << " :You may not reregister\r\n";
+		message << ":irc.myyamin.chat " << ERR_ALREADYREGISTERED << " " << _client << " :You may not reregister\r\n";
 		_message = message.str();
 	}
 	virtual ~AlreadyRegisteredException() throw () {}
@@ -206,14 +217,15 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_message;
 };
 
 class	NeedMoreParamsException : public std::exception {
 public:
-	NeedMoreParamsException(const std::string& command) : _command(command) {
+	NeedMoreParamsException(const std::string& client, const std::string& command) : _client(client), _command(command) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NEEDMOREPARAMS << " " << _command << " :Not enough parameters\r\n";
+		message << ":irc.myyamin.chat " << ERR_NEEDMOREPARAMS << " " << _client << " " << _command << " :Not enough parameters\r\n";
 		_message = message.str();
 	}
 	virtual ~NeedMoreParamsException() throw() {}
@@ -221,15 +233,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_command;
 	std::string	_message;
 };
 
 class	PasswdMismatchException : public std::exception {
 public:
-	PasswdMismatchException(const std::string & username) : _username(username) {
+	PasswdMismatchException(const std::string & client) : _client(client) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_PASSWDMISMATCH << " " << _username << " :Password incorrect\r\n";
+		message << ":irc.myyamin.chat " << ERR_PASSWDMISMATCH << " " << _client << " :Password incorrect\r\n";
 		_message = message.str();
 	}
 	virtual ~PasswdMismatchException() throw() {}
@@ -237,31 +250,15 @@ public:
 		return (_message.c_str());
 	}
 private:
-	std::string	_message;
-	std::string	_username;
-};
-
-class	KeySetException : public std::exception {
-public:
-	KeySetException(const std::string& channel) : _channel(channel) {
-		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_KEYSET << " " << _channel << " :Channel key already set\r\n";
-		_message = message.str();
-	}
-	virtual ~KeySetException() throw () {}
-	virtual const char* what() const throw() { 
-		return (_message.c_str());
-	}
-private:
-	std::string	_channel;
+	std::string	_client;
 	std::string	_message;
 };
 
 class	ChannelIsFullException : public std::exception {
 public:
-	ChannelIsFullException(const std::string& channel) : _channel(channel) {
+	ChannelIsFullException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_CHANNELISFULL << " " << _channel << " :Cannot join channel (+l)\r\n";
+		message << ":irc.myyamin.chat " << ERR_CHANNELISFULL << " " << _client << " " << _channel << " :Cannot join channel (+l)\r\n";
 		_message = message.str();
 	}
 	virtual ~ChannelIsFullException() throw() {}
@@ -269,15 +266,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_channel;
 	std::string	_message;
 };
 
 class	UnknownModeException : public std::exception {
 public:
-	UnknownModeException(const std::string& param) : _param(param) {
+	UnknownModeException(const std::string& client, const std::string& param) : _client(client), _param(param) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_UNKNOWNMODE << " " << _param << " :Is unknown mode char to me\r\n";
+		message << ":irc.myyamin.chat " << ERR_UNKNOWNMODE << " " << _client << " " << _param << " :Is unknown mode char to me\r\n";
 		_message = message.str();
 	}
 	virtual ~UnknownModeException() throw () {}
@@ -285,15 +283,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string	_client;
 	std::string	_param;
 	std::string	_message;
 };
 
 class	InviteOnlyChanException : public std::exception {
 public:
-	InviteOnlyChanException(const std::string& channel) : _channel(channel) {
+	InviteOnlyChanException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_INVITEONLYCHAN << " " << _channel << " :Cannot join channel (+i)\r\n";
+		message << ":irc.myyamin.chat " << ERR_INVITEONLYCHAN << " " << _client << " " << _channel << " :Cannot join channel (+i)\r\n";
 		_message = message.str();
 	}
 	virtual ~InviteOnlyChanException() throw () {}
@@ -301,15 +300,16 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_channel;
 	std::string	_message;
 };
 
 class	BadChannelKeyException : public std::exception {
 public:
-	BadChannelKeyException(const std::string& channel) : _channel(channel) {
+	BadChannelKeyException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_BADCHANNELKEY << " " << _channel << " :Cannot join channel (+k)\r\n";
+		message << ":irc.myyamin.chat " << ERR_BADCHANNELKEY << " " << _client << " " << _channel << " :Cannot join channel (+k)\r\n";
 		_message = message.str();
 	}
 	virtual ~BadChannelKeyException() throw () {}
@@ -317,6 +317,7 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_channel;
 	std::string	_message;
 };
@@ -339,9 +340,9 @@ private:
 
 class	ChanOPrivsNeededException : public std::exception {
 public:
-	ChanOPrivsNeededException(const std::string& channel) : _channel(channel) {
+	ChanOPrivsNeededException(const std::string& client, const std::string& channel) : _client(client), _channel(channel) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_CHANOPRIVSNEEDED << " " << _channel << " :You're not channel operator\r\n";
+		message << ":irc.myyamin.chat " << ERR_CHANOPRIVSNEEDED << " " << _client << " " << _channel << " :You're not channel operator\r\n";
 		_message = message.str();
 	}
 	virtual ~ChanOPrivsNeededException() throw () {}
@@ -349,6 +350,7 @@ public:
 		return (_message.c_str());
 	}
 private:
+	std::string _client;
 	std::string	_channel;
 	std::string	_message;
 };

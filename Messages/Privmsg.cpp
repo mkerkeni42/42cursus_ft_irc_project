@@ -10,14 +10,14 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
     iss >> cmd >> recipient >> std::ws;
 	std::getline(iss, message);
 	if (recipient.empty())
-		throw (NeedMoreParamsException(cmd));
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
 	if (message.empty())
-		throw (NoTextToSendException());
+		throw (NoTextToSendException(user.getNickname()));
 	if (recipient[0] == '#')
 		recipient = recipient.substr(1);
 	if (_channelServ.DoesChannelExist(recipient) == true) {
 		if (_channelServ.isUserOnChannel(recipient, user) == false)
-			throw (NotOnChannelException(recipient));
+			throw (NotOnChannelException(user.getNickname(), recipient));
 		message = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost PRIVMSG #" + recipient + " " + message + "\r\n";
 		_channelServ.getChannel(recipient)->broadcastMessageOnChannel(message, user);
 	}
@@ -26,6 +26,5 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 		_userServ.broadcastPrivateMessage(message, recipient);
 	}
 	else
-		throw (NoSuchNickException(recipient));
-	// need to handle multiple recipients (channels or nicknames or both)
+		throw (NoSuchNickException(user.getNickname(), recipient));
 }

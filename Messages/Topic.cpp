@@ -11,15 +11,15 @@ void	MessageServ::handleTopicCommand(std::string & command, User & user) {
     iss >> cmd >> channel >> std::ws;
 	std::getline(iss, topic);
 	if (channel.empty() || channel[0] != '#')
-		throw (NeedMoreParamsException(cmd));
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
 	channel = channel.substr(1);
 	if (_channelServ.DoesChannelExist(channel) == false)
-		throw (NoSuchChannelException(channel));
+		throw (NoSuchChannelException(user.getNickname(), channel));
 	if (_channelServ.isUserOnChannel(channel, user) == false)
-		throw (NotOnChannelException(channel));
+		throw (NotOnChannelException(user.getNickname(), channel));
 	Channel	*channelObj = _channelServ.getChannel(channel);
 	if (channelObj->getTopicMode() == CHANOP_ONLY && channelObj->isOperator(user.getUsername()) == false)
-		throw (ChanOPrivsNeededException(channel));
+		throw (ChanOPrivsNeededException(user.getNickname(), channel));
 	if (topic.empty()) {
 		std::ostringstream	topicMsg;
 		topicMsg << ":irc.myyamin.chat " << RPL_TOPIC << " " << user.getNickname() << " #" << channel << " :" << _channelServ.getChannel(channel)->getTopic() << "\r\n";

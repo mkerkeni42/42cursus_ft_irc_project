@@ -9,7 +9,7 @@ static void	sendResponse(User &user, std::vector<std::string> &channels, Channel
 	_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response, user);
 	if (_channelServ.getChannel(channels[i])->getTopic() != "") {
 		std::ostringstream	topicMsg;
-		topicMsg << ":irc.myyamin.chat " << RPL_TOPIC << " " << user.getNickname() << " #" << channels[i] << " :" << _channelServ.getChannel(channels[i])->getTopic() << "\r\n";
+		topicMsg << ":irc.myyamin.chat " << RPL_TOPIC << " " << user.getNickname() << " #" << channels[i] << " " << _channelServ.getChannel(channels[i])->getTopic() << "\r\n";
 		response = topicMsg.str();
 		user.broadcastMessageToHimself(response);
 	}
@@ -22,15 +22,15 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 
     iss >> cmd >> channel >> key >> std::ws;
 	if (channel.empty())
-		throw (NeedMoreParamsException(cmd));
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
 	std::vector<std::string>	channels;
-	getList(channel, channels, 0);
+	getList(channel, channels, 0, user);
 	std::vector<std::string>	keys;
 	if (!key.empty())
-		getList(key, keys, 0);
+		getList(key, keys, 0, user);
 	for (size_t i = 0; i < channels.size(); i++) {
 		if (user.getJoinedChanNb() == MAX_CHANNELS_PER_USER)
-			throw (TooManyChannelsException(channels[i]));
+			throw (TooManyChannelsException(user.getNickname(), channels[i]));
 		if (_channelServ.DoesChannelExist(channels[i]) == false) {
 			_channelServ.createChannel(channels[i], user);
 			user.incJoinedChanNb();
@@ -38,13 +38,13 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 		}
 		else {
 			if (_channelServ.isChannelFull(channels[i]) == true)
-				throw (ChannelIsFullException(channels[i]));
+				throw (ChannelIsFullException(user.getNickname(), channels[i]));
 			if (_channelServ.getChannel(channels[i])->getMode() == INVITE_ONLY \
-				&& _channelServ.isUserInvited(channels[i], user) == false)
-					throw (InviteOnlyChanException(channels[i]));
+				&& _channelServ.getChannel(channels[i])->isInvited(user.getNickname()) == false)
+					throw (InviteOnlyChanException(user.getNickname(), channels[i]));
 			if (_channelServ.getChannel(channels[i])->getMode() == PROTECTED) {
 				if (keys.size() <= i || _channelServ.getChannel(channels[i])->getPassword() != keys[i])
-					throw BadChannelKeyException(channels[i]);
+					throw BadChannelKeyException(user.getNickname(), channels[i]);
 			}
 			_channelServ.joinChannel(channels[i], user);
 			user.incJoinedChanNb();
@@ -61,12 +61,12 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
     iss >> cmd >> channel >> std::ws;
 	std::getline(iss, reason);
 	if (channel.empty())
-		throw (NeedMoreParamsException(cmd));
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
 	std::vector<std::string>	channels;
-	getList(channel, channels, 1);
+	getList(channel, channels, 1, user);
 	for (size_t i = 0; i < channels.size(); i++) {
 		if (_channelServ.isUserOnChannel(channels[i], user) == false)
-			throw (NotOnChannelException(channels[i]));
+			throw (NotOnChannelException(user.getNickname(), channels[i]));
 		_channelServ.leaveChannel(channels[i], user);
 		user.decJoinedChanNb();
 		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost PART #" + channels[i];

@@ -18,7 +18,7 @@ public:
 	typedef void (MessageServ::*CommandHandler)(std::string & command, User & user);
 
     void	handleCommand(std::string & command, User& user);
-    void	getList(std::string const &	arg, std::vector<std::string> &list, int x);
+    void	getList(std::string const &	arg, std::vector<std::string> &list, int x, User& user);
 
 private:
 
@@ -36,8 +36,8 @@ private:
     void	handleKickCommand(std::string & command, User & user);
     void	handleTopicCommand(std::string & command, User & user);
     void    handleModeCommand(std::string & command, User & user);
-    void    handleSetMode(Channel *channel, char const & mode, std::string arg);
-    void    handleRemoveMode(Channel *channel, char const & mode, std::string arg);
+    int     handleSetMode(Channel *channel, char const & mode, std::istringstream &arg, User &user);
+    void    handleRemoveMode(Channel *channel, char const & mode, std::istringstream &arg, User &user);
     void	handlePrivmsgCommand(std::string & command, User & user);
     void    handleCapCommand(std::string & command, User & user);
     void	handlePingCommand(std::string & command, User & user);

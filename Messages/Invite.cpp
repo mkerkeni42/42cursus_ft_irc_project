@@ -6,29 +6,32 @@
 void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	std::cout << "Handling INVITE command" << std::endl;
 	std::istringstream iss(command);
-    std::string cmd, channel, nickname;
+    std::string cmd, nickname, channel;
 
-    iss >> cmd >> channel >> nickname >> std::ws;
-	if (channel.empty() || channel[0] != '#' || nickname.empty())
-		throw (NeedMoreParamsException(cmd));
-	channel = channel.substr(1);
+    iss >> cmd >> nickname >> channel >> std::ws;
+	if (nickname.empty() || channel.empty())
+		throw (NeedMoreParamsException(user.getNickname(), cmd));
+	if (channel[0] == '#')
+		channel = channel.substr(1);
 	if (_channelServ.DoesChannelExist(channel) == false)
-		throw (NoSuchChannelException(channel));
+		throw (NoSuchChannelException(user.getNickname(), channel));
 	if (_channelServ.isUserOnChannel(channel, user) == false)
-		throw (NotOnChannelException(channel));
+		throw (NotOnChannelException(user.getNickname(), channel));
 	Channel	*channelObj = _channelServ.getChannel(channel);
-	if (channelObj->isOperator(user.getUsername()) == false)
-		throw (ChanOPrivsNeededException(channel));
+	if (channelObj->getMode() == INVITE_ONLY && channelObj->isOperator(user.getNickname()) == false)
+		throw (ChanOPrivsNeededException(user.getNickname(), channel));
 	if (_userServ.isNicknameInUse(nickname) == false)
-		throw (NoSuchNickException(nickname));
+		throw (NoSuchNickException(user.getNickname(), nickname));
 	User	*guest = _userServ.getUserByNickname(nickname);
 	if (_channelServ.isUserOnChannel(channel, *guest) == true)
-		throw (UserOnChannelException((*guest).getUsername(), channel));
-	channelObj->setInvitedUsers((*guest).getUsername());
-	//std::string	message = user.getNickname() + " invites you to join channel #" + channel; // check server format for this message
-	std::ostringstream	message;
-	message << ":irc.myyamin.chat " << RPL_INVITING << " " << user.getUsername() << " " << guest->getNickname() << " " << channel << "\r\n";
-	std::string	response = message.str();
-	_userServ.broadcastPrivateMessage(response.c_str(), nickname);
-	// need to handle multiple channels in one INVITE command
+		throw (UserOnChannelException(user.getNickname(), (*guest).getNickname(), channel));
+	channelObj->addInvitedUser((*guest).getNickname());
+	std::ostringstream	invitation;
+	invitation << ":irc.myyamin.chat " << RPL_INVITING << " " << user.getNickname() << " " << guest->getNickname() << " #" << channel << "\r\n";
+	std::string	response = invitation.str();
+	user.broadcastMessageToHimself(response);
+	std::ostringstream message;
+	message << ":" << user.getNickname() << "!" << user.getUsername() << "@localhost INVITE " << nickname << " :#" << channel << "\r\n";
+	response = message.str();
+	_userServ.broadcastPrivateMessage(response, nickname);
 }
