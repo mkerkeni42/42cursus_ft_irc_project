@@ -3,7 +3,7 @@
 
 User::User(void) {}
 
-User::User(int fd) : _fd(fd), _registered(false), _username("*"), _nickname("*"), _joinedChanNb(0) {}
+User::User(int fd) : _fd(fd), _registered(false), _username("*"), _nickname("*"), _joinedChanNb(0), _notified(false) {}
 
 User::~User(void) {}
 
@@ -29,6 +29,7 @@ void	User::setNickname(std::string const & nickname, UserServ & userServ) {
     }
     std::string    oldNickname = this->_nickname;
     this->_nickname = nickname;
+    this->_notified = false;
     userServ.updateUserNicknameMap(oldNickname, nickname, this);
     
 }
@@ -41,6 +42,10 @@ void    User::decJoinedChanNb(void) {
     if (this->_joinedChanNb > 0)
         this->_joinedChanNb--;
 }
+
+bool	User::isNotified(void) const { return (_notified); }
+
+void	User::setNotified(bool notified) { _notified = notified; }
 
 void		User::broadcastMessageToHimself(const std::string& message) {
     if (send(this->_fd, message.c_str(), message.size(), 0) == -1) {

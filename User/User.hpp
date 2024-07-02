@@ -27,6 +27,10 @@ public:
 	
 	void		incJoinedChanNb(void);
 	void		decJoinedChanNb(void);
+
+	bool		isNotified(void) const;
+	void		setNotified(bool notified);
+
 	
 	int			receiveData();
     bool		hasBufferedCommand() const;
@@ -42,4 +46,5 @@ private:
 	std::string	_nickname;
 	std::string	_realname;
 	int			_joinedChanNb;
+	bool		_notified;
 };

@@ -13,15 +13,6 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 		return;
 	if (target.empty())
 		throw (NeedMoreParamsException(user.getNickname(), cmd));
-	if (mode.empty()) {
-		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << RPL_CHANNELMODEIS << " " << user.getNickname() << " " << target << " " << mode << " " << arg << "\r\n";
-		std::string	response = message.str();
-		std::cout << response;
-		user.broadcastMessageToHimself(response);
-		return;
-	}
-	
 	std::string	channel;
 	if (target[0] == '#')
 		channel = target.substr(1);
@@ -32,6 +23,14 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 	if (_channelServ.isUserOnChannel(channel, user) == false)
 		throw (NotOnChannelException(user.getNickname(), channel));
 	Channel	*channelObj = _channelServ.getChannel(channel);
+	if (mode.empty()) {
+		std::ostringstream	message;
+		message << ":irc.myyamin.chat " << RPL_CHANNELMODEIS << " " << user.getNickname() << " " << target << " " << channelObj->getModes() << "\r\n";
+		std::string	response = message.str();
+		std::cout << response;
+		user.broadcastMessageToHimself(response);
+		return;
+	}
 	if (channelObj->isOperator(user.getNickname()) == false)
 		throw (ChanOPrivsNeededException(user.getNickname(), target));
 	for (size_t i = 0; i < mode.length(); i++) {
@@ -45,12 +44,15 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 		if (mode[i] == '+') {
 			while (mode[i] && mode[i] != '-') {
 				ret = handleSetMode(channelObj, mode[i], args, user);
+				if (ret != 1)
+					channelObj->addMode(mode[i]);
 				i++;
 			}
 		}
 		else if (mode[i] == '-') {
 			while (mode[i] && mode[i] != '+') {
 				handleRemoveMode(channelObj, mode[i], args, user);
+				channelObj->deleteMode(mode[i]);
 				i++;
 			}
 		}
@@ -82,7 +84,6 @@ int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istring
 				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
 			channel->setPasswordMode(ENABLED);
 			channel->setPassword(key);
-			channel->setMode(PROTECTED);
 			break;
 		}
 		case 'o': {
@@ -125,7 +126,6 @@ void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::ist
 			break;
 		case 'k': {
 			channel->setPasswordMode(DISABLED);
-			channel->setMode(PUBLIC);
 			std::string	emptykey = "*";
 			channel->setPassword(emptykey);
 			break;

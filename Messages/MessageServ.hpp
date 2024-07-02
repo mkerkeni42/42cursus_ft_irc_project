@@ -19,6 +19,7 @@ public:
 
     void	handleCommand(std::string & command, User& user);
     void	getList(std::string const &	arg, std::vector<std::string> &list, int x, User& user);
+    void	resetUsersNotif(std::map<std::string, Channel>& channels);
 
 private:
 

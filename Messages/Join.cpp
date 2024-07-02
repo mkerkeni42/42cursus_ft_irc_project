@@ -39,17 +39,18 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 		else {
 			if (_channelServ.isChannelFull(channels[i]) == true)
 				throw (ChannelIsFullException(user.getNickname(), channels[i]));
-			if (_channelServ.getChannel(channels[i])->getMode() == INVITE_ONLY \
-				&& _channelServ.getChannel(channels[i])->isInvited(user.getNickname()) == false)
-					throw (InviteOnlyChanException(user.getNickname(), channels[i]));
-			if (_channelServ.getChannel(channels[i])->getMode() == PROTECTED) {
+			if (_channelServ.getChannel(channels[i])->getPasswordMode() == ENABLED) {
 				if (keys.size() <= i || _channelServ.getChannel(channels[i])->getPassword() != keys[i])
 					throw BadChannelKeyException(user.getNickname(), channels[i]);
 			}
+			if (_channelServ.getChannel(channels[i])->getMode() == INVITE_ONLY \
+				&& _channelServ.getChannel(channels[i])->isInvited(user.getNickname()) == false)
+					throw (InviteOnlyChanException(user.getNickname(), channels[i]));
 			_channelServ.joinChannel(channels[i], user);
 			user.incJoinedChanNb();
 		}
 		sendResponse(user, channels, _channelServ, i);
+		resetUsersNotif(_channelServ.getChannelsList());
 	}
 }
 

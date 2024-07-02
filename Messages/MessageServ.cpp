@@ -91,6 +91,24 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 	user.setUsername(username);
 }
 
+void	printMap(std::map<std::string, User*> map) {
+	std::map<std::string, User*>::iterator	it;
+	for (it = map.begin(); it != map.end(); ++it)
+        std::cout << it->first << std::endl;
+}
+
+void	MessageServ::resetUsersNotif(std::map<std::string, Channel>& channels) {
+	std::map<std::string, Channel>::iterator	it;
+	for (it = channels.begin(); it != channels.end(); ++it) {
+		Channel	&channel = it->second;
+		std::vector<User*>	&users = channel.getUsers();
+		for (std::vector<User*>::iterator	it = users.begin(); it != users.end(); ++it) {
+			User*	user = *it;
+			user->setNotified(false);
+		}
+	}	
+}
+
 void	MessageServ::handleNickCommand(std::string & command, User & user) {
 	std::cout << "Handling NICK command" << std::endl;
 	std::istringstream	iss(command);
@@ -116,16 +134,19 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 	std::string message = ":" + user.getNickname() + "!~" + user.getUsername() + "@localhost" + " NICK :" + nickname + "\r\n";
 	std::string	oldNickname = user.getNickname();
 	user.setNickname(nickname, _userServ);
-	user.broadcastMessageToHimself(message);
 	std::map<std::string, Channel> &channels = _channelServ.getChannelsList();
 	std::map<std::string, Channel>::iterator	it;
 	for (it = channels.begin(); it != channels.end(); ++it) {
 		Channel	&channel = it->second;
+		//std::map<std::string, User*>	nickMap = channel.getNicknameMap();
+		//printMap(nickMap);
 		if (channel.isUserOnChannel(oldNickname) == true) {
 			channel.updateNicknameMap(&user, oldNickname);
 			channel.broadcastMessageOnChannel(message, user);
 		}
 	}
+	resetUsersNotif(channels);
+	user.broadcastMessageToHimself(message);
 }
 
 void	MessageServ::handlePassCommand(std::string & command, User & user) {
