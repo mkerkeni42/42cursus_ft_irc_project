@@ -3,7 +3,7 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handleTopicCommand(std::string & command, User & user) {
+bool	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	std::cout << "Handling TOPIC command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, channel, topic;
@@ -37,4 +37,5 @@ void	MessageServ::handleTopicCommand(std::string & command, User & user) {
 		user.broadcastMessageToHimself(response);
 		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
 	}
+	return true;
 }

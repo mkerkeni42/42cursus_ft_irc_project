@@ -107,10 +107,7 @@ bool	Channel::isInvited(const std::string& nickname) const {
 }
 
 void	Channel::addMode(char newMode) {
-	 if (_modes.empty()) {
-        _modes.push_back('+');
-    }
-	std::vector<char>::iterator	it = std::lower_bound(_modes.begin() + 1, _modes.end(), newMode);
+	std::vector<char>::iterator	it = std::lower_bound(_modes.begin(), _modes.end(), newMode);
 	if (it != _modes.end() && *it == newMode)
 		return;
 	_modes.insert(it, newMode);

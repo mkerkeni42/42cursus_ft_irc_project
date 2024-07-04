@@ -1,0 +1,68 @@
+<< CAP LS
+<< NICK mkerkeni
+<< USER mkerkeni mkerkeni irc.libera.chat :Myriam Kerkeni
+>> :calcium.libera.chat NOTICE * :*** Checking Ident
+>> :calcium.libera.chat NOTICE * :*** Looking up your hostname...
+>> :calcium.libera.chat NOTICE * :*** Couldn't look up your hostname
+>> :calcium.libera.chat NOTICE * :*** No Ident response
+>> :calcium.libera.chat CAP * LS :account-notify away-notify chghost extended-join multi-prefix sasl tls account-tag cap-notify echo-message server-time solanum.chat/identify-msg solanum.chat/oper solanum.chat/realhost
+<< CAP REQ :multi-prefix
+>> :calcium.libera.chat CAP mkerkeni ACK :multi-prefix
+<< CAP END
+>> :calcium.libera.chat 001 mkerkeni :Welcome to the Libera.Chat Internet Relay Chat Network mkerkeni
+<< MODE mkerkeni +i
+>> :calcium.libera.chat 002 mkerkeni :Your host is calcium.libera.chat[64.86.243.186/6697], running version solanum-1.0-dev
+>> :calcium.libera.chat 003 mkerkeni :This server was created Mon Nov 13 2023 at 21:34:42 UTC
+>> :calcium.libera.chat 004 mkerkeni calcium.libera.chat solanum-1.0-dev DGIMQRSZaghilopsuwz CFILMPQRSTbcefgijklmnopqrstuvz bkloveqjfI
+>> :calcium.libera.chat 005 mkerkeni ACCOUNTEXTBAN=a ETRACE SAFELIST ELIST=CMNTU MONITOR=100 CALLERID=g FNC WHOX KNOCK CHANTYPES=# EXCEPTS INVEX :are supported by this server
+>> :calcium.libera.chat 005 mkerkeni CHANMODES=eIbq,k,flj,CFLMPQRSTcgimnprstuz CHANLIMIT=#:250 PREFIX=(ov)@+ MAXLIST=bqeI:100 MODES=4 NETWORK=Libera.Chat STATUSMSG=@+ CASEMAPPING=rfc1459 NICKLEN=16 MAXNICKLEN=16 CHANNELLEN=50 TOPICLEN=390 :are supported by this server
+>> :calcium.libera.chat 005 mkerkeni DEAF=D TARGMAX=NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:4,NOTICE:4,ACCEPT:,MONITOR: EXTBAN=$,agjrxz :are supported by this server
+>> :calcium.libera.chat 251 mkerkeni :There are 71 users and 35128 invisible on 28 servers
+>> :calcium.libera.chat 252 mkerkeni 41 :IRC Operators online
+>> :calcium.libera.chat 253 mkerkeni 168 :unknown connection(s)
+>> :calcium.libera.chat 254 mkerkeni 23281 :channels formed
+>> :calcium.libera.chat 255 mkerkeni :I have 2452 clients and 1 servers
+>> :calcium.libera.chat 265 mkerkeni 2452 3837 :Current local users 2452, max 3837
+>> :calcium.libera.chat 266 mkerkeni 35199 37286 :Current global users 35199, max 37286
+>> :calcium.libera.chat 250 mkerkeni :Highest connection count: 3838 (3837 clients) (586118 connections received)
+>> :calcium.libera.chat 375 mkerkeni :- calcium.libera.chat Message of the Day - 
+>> :calcium.libera.chat 372 mkerkeni :- Welcome to Libera Chat, the IRC network for
+>> :calcium.libera.chat 372 mkerkeni :- free & open-source software and peer directed projects.
+>> :calcium.libera.chat 372 mkerkeni :-  
+>> :calcium.libera.chat 372 mkerkeni :- Use of Libera Chat is governed by our network policies.
+>> :calcium.libera.chat 372 mkerkeni :-  
+>> :calcium.libera.chat 372 mkerkeni :- To reduce network abuses we perform open proxy checks
+>> :calcium.libera.chat 372 mkerkeni :- on hosts at connection time.
+>> :calcium.libera.chat 372 mkerkeni :-  
+>> :calcium.libera.chat 372 mkerkeni :- Please visit us in #libera for questions and support.
+>> :calcium.libera.chat 372 mkerkeni :-  
+>> :calcium.libera.chat 372 mkerkeni :- Website and documentation:  https://libera.chat
+>> :calcium.libera.chat 372 mkerkeni :- Webchat:                    https://web.libera.chat
+>> :calcium.libera.chat 372 mkerkeni :- Network policies:           https://libera.chat/policies
+>> :calcium.libera.chat 372 mkerkeni :- Email:                      support@libera.chat
+>> :calcium.libera.chat 376 mkerkeni :End of /MOTD command.
+>> :mkerkeni MODE mkerkeni :+Ziw
+<< PING calcium.libera.chat
+>> :calcium.libera.chat PONG calcium.libera.chat :calcium.libera.chat
+--> lag pong
+<< JOIN #testeee
+>> :mkerkeni!~mkerkeni@62.129.8.171 JOIN #testeee
+>> :calcium.libera.chat MODE #testeee +Cnst
+>> :calcium.libera.chat 353 mkerkeni @ #testeee :@mkerkeni
+>> :calcium.libera.chat 366 mkerkeni #testeee :End of /NAMES list.
+<< MODE #testeee
+>> :calcium.libera.chat 324 mkerkeni #testeee +Cnst
+--> chanquery mode
+<< WHO #testeee
+>> :calcium.libera.chat 329 mkerkeni #testeee 1720099787
+--> event 329
+>> :calcium.libera.chat 352 mkerkeni #testeee ~mkerkeni 62.129.8.171 calcium.libera.chat mkerkeni H@ :0 Myriam Kerkeni
+--> silent event who
+>> :calcium.libera.chat 315 mkerkeni #testeee :End of /WHO list.
+--> chanquery who end
+<< MODE #testeee b
+>> :calcium.libera.chat 368 mkerkeni #testeee :End of Channel Ban List
+--> chanquery ban end
+<< NICK nononononon
+>> :mkerkeni!~mkerkeni@62.129.8.171 NICK :nononononon
+<< QUIT :leaving

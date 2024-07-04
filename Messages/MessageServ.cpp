@@ -36,13 +36,21 @@ void	MessageServ::handleCommand(std::string & command, User& user) {
 	try {
 		std::map<std::string, CommandHandler>::iterator it = _commandMap.find(cmd);
 		if (it != _commandMap.end())
-			(this->*(it->second))(command, user);
+		{
+			if (!(this->*(it->second))(command, user))
+				return ;
+		}
 		else
 			throw (UnknownCommandException(user.getUsername(), cmd));
+		if (user.getRegistrationStatus() == false && user.getPasswdStatus() == true && user.getNickname() != "*" && user.getUsername() != "*")
+		{
+			user.setRegistrationStatus(true);
+			sendWelcomeMessages(user);
+		}
 	}
 	catch (std::exception &e) {
 		std::ostringstream message;
-		message << e.what() << "\r\n";
+		message << e.what();
 		std::string	response = message.str();
 		user.broadcastMessageToHimself(response);
 	}
@@ -50,7 +58,7 @@ void	MessageServ::handleCommand(std::string & command, User& user) {
 
 MessageServ::~MessageServ(void) {}
 
-void MessageServ::handleCapCommand(std::string & command, User & user) {
+bool MessageServ::handleCapCommand(std::string & command, User & user) {
     std::cout << "Handling CAP command: " << std::endl;
     std::istringstream iss(command);
     std::string cmd, subCommand, capabilities;
@@ -74,9 +82,10 @@ void MessageServ::handleCapCommand(std::string & command, User & user) {
         std::string response = ":irc.myyamin.chat CAP " + user.getNickname() + " ERR :Unknown CAP subcommand\r\n";
         user.broadcastMessageToHimself(response);
     }
+	return true;
 }
 
-void	MessageServ::handleUserCommand(std::string & command, User & user) {
+bool	MessageServ::handleUserCommand(std::string & command, User & user) {
 	std::cout << "Handling USER command" << std::endl;
 	std::istringstream	iss(command);
 	std::string cmd, username, mode, unused, realname;
@@ -89,6 +98,7 @@ void	MessageServ::handleUserCommand(std::string & command, User & user) {
 		throw (AlreadyRegisteredException(user.getUsername()));
 	user.setRealname(realname);
 	user.setUsername(username);
+	return true;
 }
 
 void	printMap(std::map<std::string, User*> map) {
@@ -109,7 +119,7 @@ void	MessageServ::resetUsersNotif(std::map<std::string, Channel>& channels) {
 	}	
 }
 
-void	MessageServ::handleNickCommand(std::string & command, User & user) {
+bool	MessageServ::handleNickCommand(std::string & command, User & user) {
 	std::cout << "Handling NICK command" << std::endl;
 	std::istringstream	iss(command);
 	std::string cmd, nickname;
@@ -136,6 +146,7 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 	user.setNickname(nickname, _userServ);
 	std::map<std::string, Channel> &channels = _channelServ.getChannelsList();
 	std::map<std::string, Channel>::iterator	it;
+	user.broadcastMessageToHimself(message);
 	for (it = channels.begin(); it != channels.end(); ++it) {
 		Channel	&channel = it->second;
 		//std::map<std::string, User*>	nickMap = channel.getNicknameMap();
@@ -146,10 +157,10 @@ void	MessageServ::handleNickCommand(std::string & command, User & user) {
 		}
 	}
 	resetUsersNotif(channels);
-	user.broadcastMessageToHimself(message);
+	return true;
 }
 
-void	MessageServ::handlePassCommand(std::string & command, User & user) {
+bool	MessageServ::handlePassCommand(std::string & command, User & user) {
 	std::cout << "Handling PASS command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, password;
@@ -160,12 +171,11 @@ void	MessageServ::handlePassCommand(std::string & command, User & user) {
 		throw (AlreadyRegisteredException(user.getUsername()));
 	if (_userServ.getPassword() != password)
 		throw (PasswdMismatchException(user.getUsername()));
-    user.setRegistrationStatus(true);
-	sendWelcomeMessages(user);
-
+    user.setPasswdStatus(true);
+	return true;
 }
 
-void	MessageServ::handleQuitCommand(std::string & command, User & user) {
+bool	MessageServ::handleQuitCommand(std::string & command, User & user) {
 	std::cout << "Handling QUIT command" << std::endl;
 	 std::istringstream iss(command);
     std::string cmd, reason;
@@ -179,9 +189,10 @@ void	MessageServ::handleQuitCommand(std::string & command, User & user) {
 	_channelServ.removeUserFromAllChannels(user);
 	_userServ.removeUserfromNetwork(user.getFD());
 	_userServ.removeUser(user.getFD());
+	return false;
 }
 
-void	MessageServ::handlePingCommand(std::string & command, User & user) {
+bool	MessageServ::handlePingCommand(std::string & command, User & user) {
 	(void)user;
 	std::cout << "Handling PING command" << std::endl;
 	std::istringstream iss(command);
@@ -192,6 +203,7 @@ void	MessageServ::handlePingCommand(std::string & command, User & user) {
 		throw (NeedMoreParamsException(user.getUsername(), "PING"));
 	std::string response = "PONG irc.myyamin.chat :" + token + "\r\n";
     user.broadcastMessageToHimself(response);
+	return true;
 }
 
 void	MessageServ::getList(std::string const &arg, std::vector<std::string> &list, int x, User& user) {

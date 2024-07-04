@@ -3,14 +3,14 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handleModeCommand(std::string & command, User & user) {
+bool	MessageServ::handleModeCommand(std::string & command, User & user) {
 	std::cout << "Handling MODE command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, target, mode, arg;
     iss >> cmd >> target >> mode;
 	getline(iss, arg);
-	if (target == "*")
-		return;
+	if (target[0] != '#')
+		return true;
 	if (target.empty())
 		throw (NeedMoreParamsException(user.getNickname(), cmd));
 	std::string	channel;
@@ -29,7 +29,7 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 		std::string	response = message.str();
 		std::cout << response;
 		user.broadcastMessageToHimself(response);
-		return;
+		return true;
 	}
 	if (channelObj->isOperator(user.getNickname()) == false)
 		throw (ChanOPrivsNeededException(user.getNickname(), target));
@@ -65,6 +65,7 @@ void	MessageServ::handleModeCommand(std::string & command, User & user) {
 		channelObj->broadcastMessageOnChannel(response, user);
 		user.broadcastMessageToHimself(response);
 	}
+	return true;
 }
 
 int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istringstream &args, User &user) {

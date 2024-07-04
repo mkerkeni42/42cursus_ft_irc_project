@@ -3,7 +3,7 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handleKickCommand(std::string & command, User & user) {
+bool	MessageServ::handleKickCommand(std::string & command, User & user) {
 	std::cout << "Handling KICK command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, channel, nickname, message;
@@ -38,4 +38,5 @@ void	MessageServ::handleKickCommand(std::string & command, User & user) {
 		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
         troublemaker->broadcastMessageToHimself(message);
 	}
+	return true;
 }

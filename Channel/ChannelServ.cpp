@@ -13,7 +13,7 @@ void	ChannelServ::leaveChannel(const std::string& channelName, User & user) {
 	_channels[channelName].removeUser(user);
 	_channels[channelName].removeOperator(user.getNickname());
 	_channels[channelName].removeInvitedUser(user.getNickname());
-	if (_channels.empty())
+	if (_channels[channelName].empty()) // find a way to check if channel is empty
 		deleteChannel(channelName);
 }
 

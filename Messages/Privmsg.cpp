@@ -3,7 +3,7 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
+bool	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 	std::cout << "Handling PRIVMSG command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, recipient, message;
@@ -27,4 +27,5 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User & user) {
 	}
 	else
 		throw (NoSuchNickException(user.getNickname(), recipient));
+	return true;
 }

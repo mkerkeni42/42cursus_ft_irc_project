@@ -3,7 +3,7 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handleInviteCommand(std::string & command, User & user) {
+bool	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	std::cout << "Handling INVITE command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, nickname, channel;
@@ -34,4 +34,5 @@ void	MessageServ::handleInviteCommand(std::string & command, User & user) {
 	message << ":" << user.getNickname() << "!" << user.getUsername() << "@localhost INVITE " << nickname << " :#" << channel << "\r\n";
 	response = message.str();
 	_userServ.broadcastPrivateMessage(response, nickname);
+	return true;
 }

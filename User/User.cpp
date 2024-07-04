@@ -3,13 +3,15 @@
 
 User::User(void) {}
 
-User::User(int fd) : _fd(fd), _registered(false), _username("*"), _nickname("*"), _joinedChanNb(0), _notified(false) {}
+User::User(int fd) : _fd(fd), _registered(false), _username("*"), _nickname("*"), _joinedChanNb(0), _notified(false), _passwdStatus(false) {}
 
 User::~User(void) {}
 
 int	User::getFD(void) const { return (this->_fd); }
 
 bool	User::getRegistrationStatus(void) const { return (this->_registered); }
+
+bool	User::getPasswdStatus(void) const { return (this->_passwdStatus); }
 
 std::string	User::getUsername(void) const { return (this->_username); }
 
@@ -18,6 +20,8 @@ std::string	User::getNickname(void) const { return (this->_nickname); }
 int	User::getJoinedChanNb(void) const { return (this->_joinedChanNb); }
 
 void	User::setRegistrationStatus(bool status) { this->_registered = status; }
+
+void	User::setPasswdStatus(bool status) { this->_passwdStatus = status; }
 
 void	User::setUsername(std::string const & username) { this->_username = username; }
 

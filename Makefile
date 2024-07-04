@@ -48,9 +48,9 @@ CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -pedantic -fsanitize=address -g3
 
 .cpp.o:
 	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling.$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳  \r"
-	@sleep 0.18
+#@sleep 0.18
 	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling..$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳\r"
-	@sleep 0.18
+#@sleep 0.18
 	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling...$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⌛\r"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 

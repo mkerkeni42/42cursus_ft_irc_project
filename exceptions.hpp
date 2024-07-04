@@ -123,7 +123,7 @@ class	NicknameInUseException : public std::exception {
 public:
 	NicknameInUseException(const std::string& client, const std::string& nick) : _client(client), _nick(nick) {
 		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << ERR_NICKNAMEINUSE << " " << _client << " " << _nick << " :Nickname is already in use\r\n";
+		message << ":irc.myyamin.chat " << ERR_NICKNAMEINUSE << " " << _client << " " << _nick << " :Nickname is already in use.\r\n";
 		_message = message.str();
 	}
 	virtual ~NicknameInUseException() throw () {}

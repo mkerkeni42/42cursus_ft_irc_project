@@ -2,6 +2,13 @@
 #include "../User/UserServ.hpp"
 #include "../User/User.hpp"
 
+/*std::string getResponse(User &user, int code, std::string message) {
+    std::ostringstream  reply;
+
+    reply << ":irc.myyamin.chat " << code << " " << user.getNickname() << " :" << message << "\r\n";
+    std::string response = 
+}*/
+
 void MessageServ::sendWelcomeMessages(User &user) {
 	std::ostringstream	welcome;
 	welcome << ":irc.myyamin.chat " << RPL_WELCOME << " " << user.getNickname() << " :Welcome to the IRC network\r\n";

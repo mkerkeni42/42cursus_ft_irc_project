@@ -15,7 +15,7 @@ static void	sendResponse(User &user, std::vector<std::string> &channels, Channel
 	}
 }
 
-void	MessageServ::handleJoinCommand(std::string & command, User & user) {
+bool	MessageServ::handleJoinCommand(std::string & command, User & user) {
 	std::cout << "Handling JOIN command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, channel, key;
@@ -52,9 +52,10 @@ void	MessageServ::handleJoinCommand(std::string & command, User & user) {
 		sendResponse(user, channels, _channelServ, i);
 		resetUsersNotif(_channelServ.getChannelsList());
 	}
+	return true;
 }
 
-void	MessageServ::handlePartCommand(std::string & command, User & user) {
+bool	MessageServ::handlePartCommand(std::string & command, User & user) {
 	std::cout << "Handling PART command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, channel, reason;
@@ -77,4 +78,5 @@ void	MessageServ::handlePartCommand(std::string & command, User & user) {
 		_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response, user);
 		user.broadcastMessageToHimself(response);
 	}
+	return true;
 }
