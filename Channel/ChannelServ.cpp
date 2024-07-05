@@ -10,10 +10,11 @@ void	ChannelServ::joinChannel(const std::string& channelName, User & user) {
 }
 
 void	ChannelServ::leaveChannel(const std::string& channelName, User & user) {
-	_channels[channelName].removeUser(user);
-	_channels[channelName].removeOperator(user.getNickname());
-	_channels[channelName].removeInvitedUser(user.getNickname());
-	if (_channels[channelName].empty()) // find a way to check if channel is empty
+	Channel&	channel = _channels[channelName];
+	channel.removeUser(user);
+	channel.removeOperator(user.getNickname());
+	channel.removeInvitedUser(user.getNickname());
+	if (channel.getUsers().empty())
 		deleteChannel(channelName);
 }
 

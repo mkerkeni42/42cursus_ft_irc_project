@@ -75,3 +75,6 @@
 
 #define DISABLED 0
 #define ENABLED 1
+
+#define	CLIENT 0
+#define	SERVER 1

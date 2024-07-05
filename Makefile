@@ -26,6 +26,7 @@ BACKGREEN = \033[45m
 SRC = 	main.cpp \
 		Network/NetworkServ.cpp \
 		Messages/MessageServ.cpp \
+		Messages/Replies.cpp \
 		Messages/Welcome.cpp \
 		Messages/Join.cpp \
 		Messages/Topic.cpp \
@@ -33,6 +34,7 @@ SRC = 	main.cpp \
 		Messages/Invite.cpp \
 		Messages/Mode.cpp \
 		Messages/Privmsg.cpp \
+		Messages/Tools.cpp \
 		User/User.cpp \
 		User/UserServ.cpp \
 		Channel/Channel.cpp \

@@ -75,7 +75,8 @@ bool	MessageServ::handlePartCommand(std::string & command, User & user) {
 		if (!reason.empty())
 			response += " " + reason;
 		response += "\r\n";
-		_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response, user);
+		if (_channelServ.DoesChannelExist(channels[i]) == true)
+			_channelServ.getChannel(channels[i])->broadcastMessageOnChannel(response, user);
 		user.broadcastMessageToHimself(response);
 	}
 	return true;

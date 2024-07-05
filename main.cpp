@@ -8,7 +8,7 @@
 bool	check_port_availability(int port) {
 	int	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
-		std::cerr << RED << "ERROR: socket creation failedq!" << std::endl;
+		std::cerr << RED << "ERROR: socket creation failed!" << std::endl;
 		return (false);
 	}
 	struct sockaddr_in	addr;

@@ -21,11 +21,8 @@ bool	MessageServ::handleTopicCommand(std::string & command, User & user) {
 	if (channelObj->getTopicMode() == CHANOP_ONLY && channelObj->isOperator(user.getUsername()) == false)
 		throw (ChanOPrivsNeededException(user.getNickname(), channel));
 	if (topic.empty()) {
-		std::ostringstream	topicMsg;
-		topicMsg << ":irc.myyamin.chat " << RPL_TOPIC << " " << user.getNickname() << " #" << channel << " :" << _channelServ.getChannel(channel)->getTopic() << "\r\n";
-		std::string	response = topicMsg.str();
-		user.broadcastMessageToHimself(response);
-		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
+		user.broadcastMessageToHimself(getRPL(user, RPL_TOPIC, "#" + channel + " :" + _channelServ.getChannel(channel)->getTopic()));
+		_channelServ.getChannel(channel)->broadcastMessageOnChannel(getRPL(user, RPL_TOPIC, "#" + channel + " :" + _channelServ.getChannel(channel)->getTopic()), user);
 	}
 	else if (topic == "::") {
 		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost TOPIC #" + channel + " :\r\n";

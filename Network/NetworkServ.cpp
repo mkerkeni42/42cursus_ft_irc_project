@@ -84,7 +84,6 @@ void	NetworkServ::acceptNewConnection() {
 
 	// Add the user to the _UserServ
 	_userServ.addUser(clientFd);
-	std::ostringstream	message;
 }
 
 void	NetworkServ::handleClientActivity(struct pollfd &pfd) {

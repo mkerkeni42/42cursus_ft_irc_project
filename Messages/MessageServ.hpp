@@ -17,9 +17,14 @@ public:
 
 	typedef bool (MessageServ::*CommandHandler)(std::string & command, User & user);
 
-    void	handleCommand(std::string & command, User& user);
-    void	getList(std::string const &	arg, std::vector<std::string> &list, int x, User& user);
-    void	resetUsersNotif(std::map<std::string, Channel>& channels);
+    void	    handleCommand(std::string & command, User& user);
+    void	    getList(std::string const &	arg, std::vector<std::string> &list, int x, User& user);
+    void	    resetUsersNotif(std::map<std::string, Channel>& channels);
+    bool	    isValidNickname(std::string nickname);
+    //void        printMap(std::map<std::string, User*> map);
+
+    std::string getRPL(User &user, int code, std::string message);
+    std::string getNotif(User &user, std::string command, int prefix, std::string message);
 
 private:
 
