@@ -3,36 +3,33 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-bool	MessageServ::handleTopicCommand(std::string & command, User & user) {
+void	MessageServ::handleTopicCommand(std::string & command, User *user) {
 	std::cout << "Handling TOPIC command" << std::endl;
 	std::istringstream iss(command);
     std::string cmd, channel, topic;
 
-    iss >> cmd >> channel >> std::ws;
-	std::getline(iss, topic);
+    iss >> cmd >> channel;
+	std::getline(iss >> std::ws, topic);
 	if (channel.empty() || channel[0] != '#')
-		throw (NeedMoreParamsException(user.getNickname(), cmd));
+		throw NeedMoreParamsException(user->getNickname(), cmd);
 	channel = channel.substr(1);
-	if (_channelServ.DoesChannelExist(channel) == false)
-		throw (NoSuchChannelException(user.getNickname(), channel));
-	if (_channelServ.isUserOnChannel(channel, user) == false)
-		throw (NotOnChannelException(user.getNickname(), channel));
+	if (!_channelServ.DoesChannelExist(channel))
+		throw NoSuchChannelException(user->getNickname(), channel);
+	if (!_channelServ.isUserOnChannel(channel, user))
+		throw NotOnChannelException(user->getNickname(), channel);
+
 	Channel	*channelObj = _channelServ.getChannel(channel);
-	if (channelObj->getTopicMode() == CHANOP_ONLY && channelObj->isOperator(user.getUsername()) == false)
-		throw (ChanOPrivsNeededException(user.getNickname(), channel));
+	if (channelObj->getTopicMode() == CHANOP_ONLY && !channelObj->isOperator(user->getNickname()))
+		throw ChanOPrivsNeededException(user->getNickname(), channel);
 	if (topic.empty()) {
-		user.broadcastMessageToHimself(getRPL(user, RPL_TOPIC, "#" + channel + " :" + _channelServ.getChannel(channel)->getTopic()));
-		_channelServ.getChannel(channel)->broadcastMessageOnChannel(getRPL(user, RPL_TOPIC, "#" + channel + " :" + _channelServ.getChannel(channel)->getTopic()), user);
+		user->broadcastMessageToHimself(getRPL(user, RPL_TOPIC, "#" + channel + " :" + channelObj->getTopic()));
+		channelObj->broadcastMessageOnChannel(getRPL(user, RPL_TOPIC, "#" + channel + " :" + channelObj->getTopic()), user, 0);
 	}
-	else if (topic == "::") {
-		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost TOPIC #" + channel + " :\r\n";
-		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
-	}
+	else if (topic == "::")
+		channelObj->broadcastMessageOnChannel(getNotif(user, cmd, CLIENT, "#" + channel + ":"), user, 0);
 	else {
 		channelObj->setTopic(topic);
-		std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost TOPIC #" + channel + " " + topic + "\r\n";
-		user.broadcastMessageToHimself(response);
-		_channelServ.getChannel(channel)->broadcastMessageOnChannel(response, user);
+		user->broadcastMessageToHimself(getNotif(user, cmd, CLIENT, "#" + channel + " " + topic));
+		channelObj->broadcastMessageOnChannel(getNotif(user, cmd, CLIENT, "#" + channel + " " + topic), user, 0);
 	}
-	return true;
 }

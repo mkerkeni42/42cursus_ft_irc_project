@@ -3,72 +3,77 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-bool	MessageServ::handleModeCommand(std::string & command, User & user) {
-	std::cout << "Handling MODE command" << std::endl;
-	std::istringstream iss(command);
-    std::string cmd, target, mode, arg;
-    iss >> cmd >> target >> mode;
-	getline(iss, arg);
-	if (target[0] != '#')
-		return true;
-	if (target.empty())
-		throw (NeedMoreParamsException(user.getNickname(), cmd));
-	std::string	channel;
-	if (target[0] == '#')
-		channel = target.substr(1);
-	else
-		channel = target;
-	if (_channelServ.DoesChannelExist(channel) == false)
-		throw (NoSuchChannelException(user.getNickname(), channel));
-	if (_channelServ.isUserOnChannel(channel, user) == false)
-		throw (NotOnChannelException(user.getNickname(), channel));
-	Channel	*channelObj = _channelServ.getChannel(channel);
-	if (mode.empty()) {
-		std::ostringstream	message;
-		message << ":irc.myyamin.chat " << RPL_CHANNELMODEIS << " " << user.getNickname() << " " << target << " " << channelObj->getModes() << "\r\n";
-		std::string	response = message.str();
-		std::cout << response;
-		user.broadcastMessageToHimself(response);
-		return true;
-	}
-	if (channelObj->isOperator(user.getNickname()) == false)
-		throw (ChanOPrivsNeededException(user.getNickname(), target));
+static bool	isValidMode(std::string mode) {
 	for (size_t i = 0; i < mode.length(); i++) {
 		if (mode[i] != '+' && mode[i] != '-' && mode[i] != 'i' && mode[i] != 't' \
 		&& mode[i] != 'k' && mode[i] != 'o' && mode[i] != 'l')
-			throw (UnknownModeException(user.getNickname(), mode));
+			return false;
 	}
+	return true;
+}
+
+void	MessageServ::handleModeCommand(std::string & command, User *user) {
+	std::cout << "Handling MODE command" << std::endl;
+	std::istringstream iss(command);
+    std::string cmd, target, mode, arg;
+    iss >> cmd >> target >> mode >> std::ws;
+	getline(iss, arg);
+
+	if (target.empty())
+		throw NeedMoreParamsException(user->getNickname(), cmd);
+	if (target[0] != '#')
+		return;
+	std::string	channel = target.substr(1);
+	if (!_channelServ.DoesChannelExist(channel))
+		throw NoSuchChannelException(user->getNickname(), channel);
+	if (!_channelServ.isUserOnChannel(channel, user))
+		throw NotOnChannelException(user->getNickname(), channel);
+
+	Channel	*channelObj = _channelServ.getChannel(channel);
+	if (mode.empty()) {
+		user->broadcastMessageToHimself(getRPL(user, RPL_CHANNELMODEIS, target + " " + channelObj->getModes()));
+		return;
+	}
+	if (!channelObj->isOperator(user->getNickname()))
+		throw ChanOPrivsNeededException(user->getNickname(), target);
+	if (!isValidMode(mode))
+		throw UnknownModeException(user->getNickname(), mode);
+
+	int ret = handleMode(channelObj, mode, arg, user);
+
+	std::string response = target + " " + mode;
+	if (!arg.empty())
+		response += " " + arg;
+	if (ret != 1) {
+		channelObj->broadcastMessageOnChannel(getNotif(user, cmd, CLIENT, response), user, 0);
+		user->broadcastMessageToHimself(getNotif(user, cmd, CLIENT, response));
+	}
+}
+
+int	MessageServ::handleMode(Channel *channel, std::string const & mode, std::string &arg, User *user) {
 	std::istringstream	args(arg);
 	int	ret;
 	for (size_t i = 0; i < mode.length(); i++) {
 		if (mode[i] == '+') {
 			while (mode[i] && mode[i] != '-') {
-				ret = handleSetMode(channelObj, mode[i], args, user);
-				if (ret != 1)
-					channelObj->addMode(mode[i]);
+				ret = handleSetMode(channel, mode[i], args, user);
+				if (ret != 2)
+					channel->addMode(mode[i]);
 				i++;
 			}
 		}
 		else if (mode[i] == '-') {
 			while (mode[i] && mode[i] != '+') {
-				handleRemoveMode(channelObj, mode[i], args, user);
-				channelObj->deleteMode(mode[i]);
+				handleRemoveMode(channel, mode[i], args, user);
+				channel->deleteMode(mode[i]);
 				i++;
 			}
 		}
 	}
-	std::string response = ":" + user.getNickname() + "!" + user.getUsername() + "@localhost MODE #" + channel + " " + mode;
-	if (!arg.empty())
-		response += " " + arg;
-	response += "\r\n";
-	if (ret != 1) {
-		channelObj->broadcastMessageOnChannel(response, user);
-		user.broadcastMessageToHimself(response);
-	}
-	return true;
+	return ret;
 }
 
-int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istringstream &args, User &user) {
+int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istringstream &args, User *user) {
 	switch (mode) {
 		case 'i':
 			channel->setMode(INVITE_ONLY);
@@ -80,9 +85,7 @@ int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istring
 			std::string	key;
 			args >> key;
 			if (key.empty())
-				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
-			if (key.empty())
-				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+				throw NeedMoreParamsException(user->getNickname(), "MODE");
 			channel->setPasswordMode(ENABLED);
 			channel->setPassword(key);
 			break;
@@ -91,33 +94,33 @@ int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istring
 			std::string	nick;
 			args >> nick;
 			if (nick.empty())
-				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+				throw NeedMoreParamsException(user->getNickname(), "MODE");
 			User *newOp = _userServ.getUserByNickname(nick);
 			if (newOp == NULL)
-				throw (NoSuchNickException(user.getNickname(), nick));
-			if (_channelServ.isUserOnChannel(channel->getName(), *newOp) == false)
-				throw (UserNotInChannelException(user.getNickname(), nick, channel->getName()));
+				throw NoSuchNickException(user->getNickname(), nick);
+			if (!_channelServ.isUserOnChannel(channel->getName(), newOp))
+				throw UserNotInChannelException(user->getNickname(), nick, channel->getName());
 			channel->addOperator(nick);
-			break;
+			return 2;
 		}
 		case 'l': {
 			std::string	limit;
 			args >> limit;
 			if (limit.empty())
-				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+				throw NeedMoreParamsException(user->getNickname(), "MODE");
 			for (size_t i = 0; i < limit.length(); i++) {
-				if (std::isdigit(limit[i]) == false) {
-					return (1);
+				if (limit.length() > 100 || !std::isdigit(limit[i])) {
+					return 1;
 				}
 			}
 			channel->setMaxUsersPerChannel(std::atoi(limit.c_str()));
 			break;
 		}
 	}
-	return (0);
+	return 0;
 }
 
-void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::istringstream &args, User& user) {
+void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::istringstream &args, User *user) {
 	switch (mode) {
 		case 'i':
 			channel->setMode(PUBLIC);
@@ -135,10 +138,10 @@ void	MessageServ::handleRemoveMode(Channel *channel, char const & mode, std::ist
 			std::string	nick;
 			args >> nick;
 			if (nick.empty())
-				throw (NeedMoreParamsException(user.getNickname(), "MODE"));
+				throw NeedMoreParamsException(user->getNickname(), "MODE");
 			User *op = _userServ.getUserByNickname(nick);
-			if (_channelServ.isUserOnChannel(channel->getName(), *op) == false)
-				throw (UserNotInChannelException(user.getNickname(), nick, channel->getName()));
+			if (!_channelServ.isUserOnChannel(channel->getName(), op))
+				throw UserNotInChannelException(user->getNickname(), nick, channel->getName());
 			channel->removeOperator(nick);
 			break;
 		}

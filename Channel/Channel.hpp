@@ -9,13 +9,12 @@ class	Channel {
 
 public:
 
-	Channel();
+	Channel(std::string const &name);
 	~Channel();
 
-	void						addUser(User& user);
-	void						removeUser(User& user);
+	void						addUser(User *user);
+	void						removeUser(User *user);
 
-	void						setName(const std::string& name);
 	void						setTopic(const std::string& newTopic);
 	void						setPassword(std::string& newPassword);
 	void						setMode(const int& newMode);
@@ -52,7 +51,7 @@ public:
 	void						deleteMode(char mode);
 	std::string					getModes(void) const;
 
-	void						broadcastMessageOnChannel(const std::string& message, User &sender);
+	void						broadcastMessageOnChannel(const std::string& message, User *sender, int x);
 	
 private:
 

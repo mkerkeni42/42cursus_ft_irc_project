@@ -35,7 +35,6 @@ void	User::setNickname(std::string const & nickname, UserServ & userServ) {
     this->_nickname = nickname;
     this->_notified = false;
     userServ.updateUserNicknameMap(oldNickname, nickname, this);
-    
 }
 
 void	User::setRealname(std::string const & realname) { this->_realname = realname; }

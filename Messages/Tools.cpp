@@ -14,7 +14,7 @@ bool	MessageServ::isValidNickname(std::string nickname) {
 	return true;
 }
 
-void	MessageServ::getList(std::string const &arg, std::vector<std::string> &list, int x, User& user) {
+void	MessageServ::getList(std::string const &arg, std::vector<std::string> &list, int x, User *user) {
 	if (arg.find(",") != std::string::npos) {
 		std::stringstream ss(arg);
     	std::string item;
@@ -22,7 +22,7 @@ void	MessageServ::getList(std::string const &arg, std::vector<std::string> &list
 			if (!item.empty() && item[0] == '#')
             	item.erase(0, 1);
 			else if (x == 1)
-				throw (NoSuchChannelException(user.getNickname(), item));
+				throw (NoSuchChannelException(user->getNickname(), item));
 			list.push_back(item);
    		}
 	}
@@ -32,20 +32,8 @@ void	MessageServ::getList(std::string const &arg, std::vector<std::string> &list
 		else if (x == 0)
 			list.push_back(arg);
 		else
-			throw (NoSuchChannelException(user.getNickname(), arg));
+			throw (NoSuchChannelException(user->getNickname(), arg));
 	}
-}
-
-void	MessageServ::resetUsersNotif(std::map<std::string, Channel>& channels) {
-	std::map<std::string, Channel>::iterator	it;
-	for (it = channels.begin(); it != channels.end(); ++it) {
-		Channel	&channel = it->second;
-		std::vector<User*>	&users = channel.getUsers();
-		for (std::vector<User*>::iterator	it = users.begin(); it != users.end(); ++it) {
-			User*	user = *it;
-			user->setNotified(false);
-		}
-	}	
 }
 
 /*void	MessageServ::printMap(std::map<std::string, User*> map) {

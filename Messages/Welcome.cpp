@@ -2,16 +2,16 @@
 #include "../User/UserServ.hpp"
 #include "../User/User.hpp"
 
-void MessageServ::sendWelcomeMessages(User &user) {
-	user.broadcastMessageToHimself(getRPL(user, RPL_WELCOME, "Welcome to the IRC network"));
-    user.broadcastMessageToHimself(getRPL(user, RPL_YOURHOST, "Your host is irc.myyamin.chat, running version 1.0"));
-    user.broadcastMessageToHimself(getRPL(user, RPL_CREATED, "This server was created today"));
-    user.broadcastMessageToHimself(getRPL(user, RPL_MYINFO, "irc.myyamin.chat 1.0 o o"));
+void MessageServ::sendWelcomeMessages(User *user) {
+	user->broadcastMessageToHimself(getRPL(user, RPL_WELCOME, "Welcome to the IRC network"));
+    user->broadcastMessageToHimself(getRPL(user, RPL_YOURHOST, "Your host is irc.myyamin.chat, running version 1.0"));
+    user->broadcastMessageToHimself(getRPL(user, RPL_CREATED, "This server was created today"));
+    user->broadcastMessageToHimself(getRPL(user, RPL_MYINFO, "irc.myyamin.chat 1.0 o o"));
     sendMotd(user);
 }
 
-void MessageServ::sendMotd(User &user) {
-    user.broadcastMessageToHimself(getRPL(user, RPL_MOTDSTART, "- irc.myyamin.chat Message of the Day -"));
+void MessageServ::sendMotd(User *user) {
+    user->broadcastMessageToHimself(getRPL(user, RPL_MOTDSTART, "- irc.myyamin.chat Message of the Day -"));
 
     std::string sun = " :-:\033[1;33m Welcome to Myyamin Chat, the best IRC server ! \
                                                                         \033[96m...............................\033[1;33m:+-\033[96m...........\033[1;33m++\033[96m........................... \
@@ -35,6 +35,6 @@ void MessageServ::sendMotd(User &user) {
                                                                         \033[96m.............................\033[1;33m:+:\033[96m........\033[1;33m-+:\033[96m.........\033[1;33m-+-\033[96m................... \
                                                                         \033[96m............................\033[1;33m:+-\033[96m..........\033[1;33m:+-\033[96m.............................. \
                                                                         \033[96m...........................\033[1;33m-+-\033[96m............\033[1;33m+:\033[96m..............................\033[0m\r\n";
-    user.broadcastMessageToHimself(getRPL(user, RPL_MOTD, sun));
-    user.broadcastMessageToHimself(getRPL(user, RPL_ENDOFMOTD, "- End of /MOTD command."));
+    user->broadcastMessageToHimself(getRPL(user, RPL_MOTD, sun));
+    user->broadcastMessageToHimself(getRPL(user, RPL_ENDOFMOTD, "- End of /MOTD command."));
 }

@@ -1,21 +1,19 @@
 #include "Channel.hpp"
 #include "../User/User.hpp"
 
-Channel::Channel() : _mode(PUBLIC), _passwordMode(DISABLED), _topicMode(PUBLIC), _maxUsersPerChannel(0) {}
+Channel::Channel(std::string const & name) : _name(name), _mode(PUBLIC), _passwordMode(DISABLED), _topicMode(PUBLIC), _maxUsersPerChannel(0) {}
 
 Channel::~Channel() {}
 
-void	Channel::addUser(User& user) {
-	_users.push_back(&user);
-	_nicknameMap[user.getNickname()] = &user;
+void	Channel::addUser(User *user) {
+	_users.push_back(user);
+	_nicknameMap[user->getNickname()] = user;
 }
 
-void	Channel::removeUser(User& user) {
-	_users.erase(std::remove(_users.begin(), _users.end(), &user), _users.end());
-	_nicknameMap.erase(user.getNickname());
+void	Channel::removeUser(User *user) {
+	_users.erase(std::remove(_users.begin(), _users.end(), user), _users.end());
+	_nicknameMap.erase(user->getNickname());
 }
-
-void	Channel::setName(const std::string& name) { _name = name; }
 
 void	Channel::setTopic(const std::string& newTopic) { _topic = newTopic; }
 
@@ -29,16 +27,18 @@ void	Channel::setPasswordMode(const int& newMode) { _passwordMode = newMode; }
 
 void	Channel::setMaxUsersPerChannel(size_t nb) { _maxUsersPerChannel = nb; }
 
-void	Channel::updateNicknameMap(User* user, const std::string& oldNickname) {
-	_nicknameMap.erase(oldNickname);
-	_nicknameMap[user->getNickname()] = user;
-	if (isOperator(oldNickname) == true) {
-		removeOperator(oldNickname);
-		addOperator(user->getNickname());
+void	Channel::updateNicknameMap(User* user, const std::string& newNickname) {
+	std::map<std::string, User*>::iterator	it = _nicknameMap.find(user->getNickname());
+	if (it != _nicknameMap.end())
+		_nicknameMap.erase(it);
+	_nicknameMap[newNickname] = user;
+	if (isOperator(user->getNickname()) == true) {
+		removeOperator(user->getNickname());
+		addOperator(newNickname);
 	}
-	if (isInvited(oldNickname) == true) {
-		removeInvitedUser(oldNickname);
-		addInvitedUser(user->getNickname());
+	if (isInvited(user->getNickname()) == true) {
+		removeInvitedUser(user->getNickname());
+		addInvitedUser(newNickname);
 	}
 }
 
@@ -123,13 +123,28 @@ void	Channel::deleteMode(char mode) {
 
 std::string	Channel::getModes(void) const { return (std::string(_modes.begin(), _modes.end())); }
 
-void	Channel::broadcastMessageOnChannel(const std::string& message, User &sender) {
+void	Channel::broadcastMessageOnChannel(const std::string& message, User *sender, int x) {
+	std::cout << "Broadcasting message on channel: " << _name << std::endl;
+	(void)sender;
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
-		if (user->getNickname() != sender.getNickname() && user->isNotified() == false) {
+		if (user->getNickname() != sender->getNickname() && !user->isNotified()) {
+			std::cout << "Sending message to: " << user->getNickname() << std::endl;
+			std::cout << "message = " << message;
 			if (send(user->getFD(), message.c_str(), message.size(), 0) == -1)
 				std::cerr << "ERROR: send call failed" << std::endl;
-			user->setNotified(true);
+			if (x == 1)
+				user->setNotified(true);
 		}
 	}
 }
+
+/*void Channel::validateUserMap() {
+    for (std::vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it) {
+        User* user = *it;
+        std::string nickname = user->getNickname();
+        if (_nicknameMap.find(nickname) == _nicknameMap.end()) {
+            std::cerr << "ERROR: User " << nickname << " is not in _nicknameMap!" << std::endl;
+        }
+    }
+}*/

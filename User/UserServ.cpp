@@ -4,10 +4,15 @@
 
 UserServ::UserServ(std::string & password, NetworkServ &networkServ) : _password(password), _networkServ(networkServ), _messageServ(*this, _channelServ), _channelServ() {}
 
-UserServ::~UserServ(void) {}
+UserServ::~UserServ(void) {
+	std::map<int, User*>::iterator	it;
+	for (it = _users.begin(); it != _users.end(); ++it)
+		delete it->second;
+	_users.clear();
+}
 
 void	UserServ::addUser(int fd) {
-	User	newUser(fd);
+	User	*newUser = new User(fd);
 	this->_users[fd] = newUser;
 }
 
@@ -16,19 +21,22 @@ void	UserServ::addUserByNickname(std::string const & nickname, User* user) {
 }
 
 void	UserServ::removeUser(int fd) {
-	User	&user = this->_users[fd];
-	if (_nicknameMap.find(user.getNickname()) != _nicknameMap.end())
-		_nicknameMap.erase(user.getNickname());
-	if (_users.find(fd) != _users.end())
-		this->_users.erase(fd);
+	User	*user = this->_users[fd];
+	if (_nicknameMap.find(user->getNickname()) != _nicknameMap.end())
+		_nicknameMap.erase(user->getNickname());
+	std::map<int, User*>::iterator	it = _users.find(fd);
+	if (it != _users.end()) {
+		delete it->second;
+		_users.erase(it);
+	}
 }
 
 int		UserServ::handleUserActivity(int fd) {
-	User	&user = _users[fd];
-	if (user.receiveData() == -1)
+	User	*user = _users[fd];
+	if (user->receiveData() == -1)
 		return (-1);
-	while (user.hasBufferedCommand()) {
-		std::string	command = user.getBufferedCommand();
+	while (user->hasBufferedCommand()) {
+		std::string	command = user->getBufferedCommand();
 		_messageServ.handleCommand(command, user);
 	}
 	return (0);
@@ -50,24 +58,6 @@ User	*UserServ::getUserByNickname(std::string const & nickname) {
 
 std::string	UserServ::getPassword() const { return (_password); }
 
-std::string	UserServ::getUsername(int fd) {
-	std::map<int, User>::iterator it = _users.find(fd);
-    if (it != _users.end()) {
-        User	user = it->second;
-		return (user.getUsername());
-    }
-    return (NULL);
-}
-
-std::string	UserServ::getNickname(int fd) {
-	std::map<int, User>::iterator it = _users.find(fd);
-    if (it != _users.end()) {
-        User	user = it->second;
-		return (user.getNickname());
-    }
-    return (NULL);
-}
-
 void	UserServ::removeUserfromNetwork(int fd) {
 	_networkServ.removeClient(fd);
 }
@@ -79,9 +69,9 @@ void	UserServ::updateUserNicknameMap(std::string const & oldNickname, std::strin
 
 
 bool UserServ::isUserRegistered(const std::string & username) {
-	std::map<int, User>::const_iterator it;
+	std::map<int, User*>::const_iterator it;
 	for ( it = _users.begin(); it != _users.end(); ++it) {
-    	if (it->second.getUsername() == username)
+    	if (it->second->getUsername() == username)
         	return true;
     }
     return false;
