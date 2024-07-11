@@ -44,6 +44,7 @@ int		UserServ::handleUserActivity(int fd) {
 
 void	UserServ::broadcastPrivateMessage(const std::string& message, std::string& recipient) {
 	User	*user = getUserByNickname(recipient);
+	std::cout << ">> " << message;
 	if (send(user->getFD(), message.c_str(), message.size(), 0) == -1)
 		std::cerr << "ERROR: send call failed" << std::endl;
 }

@@ -20,6 +20,5 @@ std::string MessageServ::getNotif(User *user, std::string command, int prefix, s
 		sender = ":irc.myyamin.chat";
     reply << sender << " " << command << " " << message << "\r\n";
     std::string response = reply.str();
-	std::cout << response;
     return (response);
 }

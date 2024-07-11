@@ -3,12 +3,12 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handlePrivmsgCommand(std::string & command, User *user) {
-	std::cout << "Handling PRIVMSG command" << std::endl;
+bool	MessageServ::handlePrivmsgCommand(std::string & command, User *user) {
 	std::istringstream iss(command);
     std::string cmd, recipient, message;
     iss >> cmd >> recipient;
 	std::getline(iss >> std::ws, message);
+
 	if (recipient.empty())
 		throw NeedMoreParamsException(user->getNickname(), cmd);
 	if (message.empty())
@@ -18,11 +18,13 @@ void	MessageServ::handlePrivmsgCommand(std::string & command, User *user) {
 	message = recipient + " " + message;
 	if (_channelServ.DoesChannelExist(recipient)) {
 		if (!_channelServ.isUserOnChannel(recipient, user))
-			throw NotOnChannelException(user->getNickname(), recipient);
+			throw NotOnChannelException(user->getNickname(), "#" + recipient);
 		_channelServ.getChannel(recipient)->broadcastMessageOnChannel(getNotif(user, cmd, CLIENT, "#" + message), user, 0);
 	}
 	else if (_userServ.isNicknameInUse(recipient)) 
 		_userServ.broadcastPrivateMessage(getNotif(user, cmd, CLIENT, message), recipient);
 	else
 		throw NoSuchNickException(user->getNickname(), recipient);
+		
+	return true;
 }

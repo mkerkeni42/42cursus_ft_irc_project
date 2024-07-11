@@ -58,8 +58,6 @@ size_t	Channel::getMaxUsersPerChannel(void) const { return (_maxUsersPerChannel)
 
 std::vector<std::string>	Channel::getInvitedUsers(void) const { return (_invitedUsers); }	
 
-const std::map<std::string, User*> &	Channel::getNicknameMap(void) const { return (_nicknameMap); }
-
 User*	Channel::getUserByNickname(const std::string& nickname) {
 	std::map<std::string, User*>::iterator	it = _nicknameMap.find(nickname);
 	if (it != _nicknameMap.end())
@@ -107,6 +105,9 @@ bool	Channel::isInvited(const std::string& nickname) const {
 }
 
 void	Channel::addMode(char newMode) {
+	if (_modes.empty() || _modes[0] != '+')
+		_modes.insert(_modes.begin(), '+');
+		
 	std::vector<char>::iterator	it = std::lower_bound(_modes.begin(), _modes.end(), newMode);
 	if (it != _modes.end() && *it == newMode)
 		return;
@@ -118,19 +119,17 @@ void	Channel::deleteMode(char mode) {
 	if (it != _modes.end())
 		_modes.erase(it);
 	if (_modes.size() == 1 && _modes[0] == '+')
-    	 _modes.clear();
+		_modes.clear();
 }
 
 std::string	Channel::getModes(void) const { return (std::string(_modes.begin(), _modes.end())); }
 
 void	Channel::broadcastMessageOnChannel(const std::string& message, User *sender, int x) {
-	std::cout << "Broadcasting message on channel: " << _name << std::endl;
 	(void)sender;
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
 		if (user->getNickname() != sender->getNickname() && !user->isNotified()) {
-			std::cout << "Sending message to: " << user->getNickname() << std::endl;
-			std::cout << "message = " << message;
+			std::cout << ">> " << message;
 			if (send(user->getFD(), message.c_str(), message.size(), 0) == -1)
 				std::cerr << "ERROR: send call failed" << std::endl;
 			if (x == 1)
@@ -138,13 +137,3 @@ void	Channel::broadcastMessageOnChannel(const std::string& message, User *sender
 		}
 	}
 }
-
-/*void Channel::validateUserMap() {
-    for (std::vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it) {
-        User* user = *it;
-        std::string nickname = user->getNickname();
-        if (_nicknameMap.find(nickname) == _nicknameMap.end()) {
-            std::cerr << "ERROR: User " << nickname << " is not in _nicknameMap!" << std::endl;
-        }
-    }
-}*/

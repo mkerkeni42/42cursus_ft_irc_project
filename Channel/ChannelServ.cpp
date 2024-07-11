@@ -87,9 +87,6 @@ Channel*	ChannelServ::getChannel(const std::string& channelName) {
 	return NULL;
 }
 
-
-std::map<std::string, Channel*>	&ChannelServ::getChannelsList() { return (_channels);}
-
 bool	ChannelServ::DoesChannelExist(const std::string & channelName) {
 	std::map<std::string, Channel*>::iterator	it = _channels.find(channelName);
 	if (it == _channels.end())

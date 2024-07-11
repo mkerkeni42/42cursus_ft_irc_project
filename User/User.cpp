@@ -51,6 +51,7 @@ bool	User::isNotified(void) const { return (_notified); }
 void	User::setNotified(bool notified) { _notified = notified; }
 
 void		User::broadcastMessageToHimself(const std::string& message) {
+    std::cout << ">> " << message;
     if (send(this->_fd, message.c_str(), message.size(), 0) == -1) {
         std::cerr << "ERROR: send call failed" << std::endl;
     }

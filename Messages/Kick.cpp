@@ -3,24 +3,23 @@
 #include "../User/User.hpp"
 #include "../Channel/ChannelServ.hpp"
 
-void	MessageServ::handleKickCommand(std::string & command, User *user) {
-	std::cout << "Handling KICK command" << std::endl;
+bool	MessageServ::handleKickCommand(std::string & command, User *user) {
 	std::istringstream iss(command);
     std::string cmd, channel, nickname, message;
-
     iss >> cmd >> channel >> nickname;
 	std::getline(iss >> std::ws, message);
+
 	if (channel.empty() || channel[0] != '#' || nickname.empty())
 		throw (NeedMoreParamsException(user->getNickname(), cmd));
 	channel = channel.substr(1);
 	if (!_channelServ.DoesChannelExist(channel))
-		throw NoSuchChannelException(user->getNickname(), channel);
+		throw NoSuchChannelException(user->getNickname(), "#" + channel);
 	if (!_channelServ.isUserOnChannel(channel, user))
-		throw NotOnChannelException(user->getNickname(), channel);
+		throw NotOnChannelException(user->getNickname(), "#" + channel);
 
 	Channel	*channelObj = _channelServ.getChannel(channel);
 	if (!channelObj->isOperator(user->getNickname()))
-		throw ChanOPrivsNeededException(user->getNickname(), channel);
+		throw ChanOPrivsNeededException(user->getNickname(), "#" + channel);
 
 	std::vector<std::string>	nicksToKick;
 	getList(nickname, nicksToKick, 0, user);
@@ -29,15 +28,18 @@ void	MessageServ::handleKickCommand(std::string & command, User *user) {
 			throw NoSuchNickException(user->getNickname(), nicksToKick[i]);
 		User	*troublemaker = _userServ.getUserByNickname(nicksToKick[i]);
 		if (!_channelServ.isUserOnChannel(channel, troublemaker))
-			throw UserNotInChannelException(user->getNickname(), troublemaker->getNickname(), channel);
+			throw UserNotInChannelException(user->getNickname(), troublemaker->getNickname(), "#" + channel);
+
 		std::string response = "#" + channel + " " + troublemaker->getNickname();
 		if (!message.empty() && message != ":")
 			response += " " + message;
 		else
 			response += " :" + nickname;
-		std::cout << response;
 		user->broadcastMessageToHimself(getNotif(user, cmd, CLIENT, response));
+		
 		_channelServ.getChannel(channel)->broadcastMessageOnChannel(getNotif(user, cmd, CLIENT, response), user, 0);
 		_channelServ.leaveChannel(channel, troublemaker);
 	}
+
+	return true;
 }

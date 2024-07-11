@@ -12,8 +12,7 @@ static bool	isValidMode(std::string mode) {
 	return true;
 }
 
-void	MessageServ::handleModeCommand(std::string & command, User *user) {
-	std::cout << "Handling MODE command" << std::endl;
+bool	MessageServ::handleModeCommand(std::string & command, User *user) {
 	std::istringstream iss(command);
     std::string cmd, target, mode, arg;
     iss >> cmd >> target >> mode >> std::ws;
@@ -22,17 +21,17 @@ void	MessageServ::handleModeCommand(std::string & command, User *user) {
 	if (target.empty())
 		throw NeedMoreParamsException(user->getNickname(), cmd);
 	if (target[0] != '#')
-		return;
+		return true;
 	std::string	channel = target.substr(1);
 	if (!_channelServ.DoesChannelExist(channel))
-		throw NoSuchChannelException(user->getNickname(), channel);
+		throw NoSuchChannelException(user->getNickname(), target);
 	if (!_channelServ.isUserOnChannel(channel, user))
-		throw NotOnChannelException(user->getNickname(), channel);
+		throw NotOnChannelException(user->getNickname(), target);
 
 	Channel	*channelObj = _channelServ.getChannel(channel);
 	if (mode.empty()) {
 		user->broadcastMessageToHimself(getRPL(user, RPL_CHANNELMODEIS, target + " " + channelObj->getModes()));
-		return;
+		return true;
 	}
 	if (!channelObj->isOperator(user->getNickname()))
 		throw ChanOPrivsNeededException(user->getNickname(), target);
@@ -48,25 +47,29 @@ void	MessageServ::handleModeCommand(std::string & command, User *user) {
 		channelObj->broadcastMessageOnChannel(getNotif(user, cmd, CLIENT, response), user, 0);
 		user->broadcastMessageToHimself(getNotif(user, cmd, CLIENT, response));
 	}
+	
+	return true;
 }
 
 int	MessageServ::handleMode(Channel *channel, std::string const & mode, std::string &arg, User *user) {
 	std::istringstream	args(arg);
-	int	ret;
+	int	ret = 0;
+	bool	addMode = true;
+
 	for (size_t i = 0; i < mode.length(); i++) {
-		if (mode[i] == '+') {
-			while (mode[i] && mode[i] != '-') {
-				ret = handleSetMode(channel, mode[i], args, user);
+		char	currentMode = mode[i];
+		if (currentMode == '+')
+			addMode = true;
+		else if (currentMode == '-')
+			addMode = false;
+		else {
+			if (addMode) {
+				ret = handleSetMode(channel, currentMode, args, user);
 				if (ret != 2)
-					channel->addMode(mode[i]);
-				i++;
-			}
-		}
-		else if (mode[i] == '-') {
-			while (mode[i] && mode[i] != '+') {
-				handleRemoveMode(channel, mode[i], args, user);
-				channel->deleteMode(mode[i]);
-				i++;
+					channel->addMode(currentMode);
+			} else {
+				handleRemoveMode(channel, currentMode, args, user);
+				channel->deleteMode(currentMode);
 			}
 		}
 	}

@@ -33,8 +33,6 @@ public:
 	size_t						getMaxUsersPerChannel(void) const;
 	std::vector<std::string>	getInvitedUsers(void) const;
 	
-	const std::map<std::string, User*> &	getNicknameMap(void) const;
-	
 	User*						getUserByNickname(const std::string& nickname);
 	std::vector<User*>&			getUsers(void);
 	bool						isUserOnChannel(const std::string& nickname);

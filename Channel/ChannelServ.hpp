@@ -23,7 +23,6 @@ public:
 	void		resetUsersNotif(void);
 	
 	Channel*	getChannel(const std::string & channelName);
-	std::map<std::string, Channel*>	&getChannelsList();
 	
 	bool		DoesChannelExist(const std::string & channelName);
 	bool		isUserOnChannel(std::string const & channelName, User *user);
