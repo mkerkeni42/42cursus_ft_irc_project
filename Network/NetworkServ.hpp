@@ -19,7 +19,6 @@ class	NetworkServ {
 
 		int								_serverFd;
 		std::vector<struct pollfd>		_fds;
-		std::map<int, struct pollfd>	_fdMap;
 		UserServ						_userServ;
 };
 

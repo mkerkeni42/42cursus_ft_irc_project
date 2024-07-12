@@ -16,7 +16,6 @@ MessageServ::MessageServ(UserServ & userServ, ChannelServ & channelServ) : _user
 	_commandMap["MODE"] = &MessageServ::handleModeCommand;
 	_commandMap["PRIVMSG"] = &MessageServ::handlePrivmsgCommand;
 	_commandMap["CAP"] = &MessageServ::handleCapCommand;
-	//_commandMap["PING"] = &MessageServ::handlePingCommand;
 }
 
 MessageServ::~MessageServ(void) {}
@@ -32,8 +31,7 @@ void	MessageServ::handleCommand(std::string & command, User *user) {
 		if (it != _commandMap.end()) {
 			if (!(this->*(it->second))(command, user))
 				return;
-		}
-		else
+		} else
 			throw (UnknownCommandException(user->getUsername(), cmd));
 		if (!user->getRegistrationStatus() && user->getPasswdStatus() && user->getNickname() != "*" && user->getUsername() != "*") {
 			user->setRegistrationStatus(true);
@@ -99,6 +97,7 @@ bool	MessageServ::handleNickCommand(std::string & command, User *user) {
 	user->broadcastMessageToHimself(getNotif(user, cmd, CLIENT, ":" + nickname));
 	_channelServ.broadcastMessageToChannels(getNotif(user, cmd, CLIENT, ":" + nickname), user);
 	_channelServ.updateNicknameInChannels(nickname, user);
+	
 	user->setNickname(nickname, _userServ);
 
 	return true;
@@ -138,19 +137,3 @@ bool	MessageServ::handleQuitCommand(std::string & command, User *user) {
 
 	return false;
 }
-
-/*bool	MessageServ::handlePingCommand(std::string & command, User *user) {
-	(void)user;
-
-	std::istringstream iss(command);
-    std::string cmd, token;
-    iss >> cmd >> token >> std::ws;
-
-	if (token.empty())
-		throw (NeedMoreParamsException(user->getUsername(), "PING"));
-
-	std::string response = "PONG irc.myyamin.chat :" + token + "\r\n";
-    user->broadcastMessageToHimself(response);
-
-	return true;
-}*/

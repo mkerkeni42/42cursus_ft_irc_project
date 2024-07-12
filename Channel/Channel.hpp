@@ -32,6 +32,7 @@ public:
 	int							getPasswordMode(void) const;
 	size_t						getMaxUsersPerChannel(void) const;
 	std::vector<std::string>	getInvitedUsers(void) const;
+	std::string					getNicknamesList(void);
 	
 	User*						getUserByNickname(const std::string& nickname);
 	std::vector<User*>&			getUsers(void);

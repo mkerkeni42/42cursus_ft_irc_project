@@ -25,7 +25,6 @@ public:
 
 	void		getList(std::string const &	arg, std::vector<std::string> &list, int x, User *user);
 	bool		isValidNickname(std::string nickname);
-	//void        printMap(std::map<std::string, User*> map);
 
 	void		sendMotd(User *user);
 	void		sendWelcomeMessages(User *user);
@@ -51,5 +50,4 @@ private:
 	bool	handleModeCommand(std::string & command, User *user);
 	bool	handlePrivmsgCommand(std::string & command, User *user);
 	bool	handleCapCommand(std::string & command, User *user);
-	//bool	handlePingCommand(std::string & command, User *user);
 };

@@ -29,6 +29,7 @@ SRC = 	main.cpp \
 		Messages/Replies.cpp \
 		Messages/Welcome.cpp \
 		Messages/Join.cpp \
+		Messages/Part.cpp \
 		Messages/Topic.cpp \
 		Messages/Kick.cpp \
 		Messages/Invite.cpp \
@@ -50,9 +51,9 @@ CXXFLAGS = -Wall -Wextra -Werror -g -std=c++98 -pedantic -fsanitize=address -g3
 
 .cpp.o:
 	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling.$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳  \r"
-#@sleep 0.18
+	@sleep 0.10
 	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling..$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⏳\r"
-#@sleep 0.18
+	@sleep 0.10
 	@printf "    $(BOLD)$(PINK)$(UNDERLINE)Compiling...$(DEF)  $(PURPLE)$(BOLD)ircserv$(DEF) ⌛\r"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 

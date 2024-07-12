@@ -13,7 +13,7 @@ void MessageServ::sendWelcomeMessages(User *user) {
 void MessageServ::sendMotd(User *user) {
     user->broadcastMessageToHimself(getRPL(user, RPL_MOTDSTART, "- irc.myyamin.chat Message of the Day -"));
 
-    std::string sun = " :-:\033[1;33m Welcome to Myyamin Chat, the best IRC server ! \
+    std::string sun = " :-:\033[1;33m Welcome to Myyamin Chat, the best and sunniest IRC server! \
                                                                         \033[96m...............................\033[1;33m:+-\033[96m...........\033[1;33m++\033[96m........................... \
                                                                         \033[96m...............................\033[1;33m-++\033[96m.........\033[1;33m-++-\033[96m........................... \
                                                                         \033[96m.....................\033[1;33m::\033[96m.........\033[1;33m:+:\033[96m.......\033[1;33m-++\033[96m..........\033[1;33m--\033[96m................. \

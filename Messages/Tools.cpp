@@ -35,9 +35,3 @@ void	MessageServ::getList(std::string const &arg, std::vector<std::string> &list
 			throw (NoSuchChannelException(user->getNickname(), arg));
 	}
 }
-
-/*void	MessageServ::printMap(std::map<std::string, User*> map) {
-	std::map<std::string, User*>::iterator	it;
-	for (it = map.begin(); it != map.end(); ++it)
-        std::cout << it->first << std::endl;
-}*/

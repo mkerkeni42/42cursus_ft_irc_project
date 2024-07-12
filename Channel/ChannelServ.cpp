@@ -54,6 +54,10 @@ void	ChannelServ::updateNicknameInChannels(const std::string &newNickname, User 
 		if (channel->isUserOnChannel(user->getNickname())) {
 			channel->updateNicknameMap(user, newNickname);
 		}
+		if (channel->isInvited(user->getNickname()) == true) {
+			channel->removeInvitedUser(user->getNickname());
+			channel->addInvitedUser(newNickname);
+		}
 	}
 }
 

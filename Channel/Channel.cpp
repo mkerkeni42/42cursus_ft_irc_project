@@ -36,10 +36,6 @@ void	Channel::updateNicknameMap(User* user, const std::string& newNickname) {
 		removeOperator(user->getNickname());
 		addOperator(newNickname);
 	}
-	if (isInvited(user->getNickname()) == true) {
-		removeInvitedUser(user->getNickname());
-		addInvitedUser(newNickname);
-	}
 }
 
 std::string	Channel::getName(void) const { return (_name); }
@@ -135,4 +131,17 @@ void	Channel::broadcastMessageOnChannel(const std::string& message, User *sender
 				user->setNotified(true);
 		}
 	}
+}
+
+std::string	Channel::getNicknamesList(void) {
+	std::string	names;
+	std::map<std::string, User*>::iterator	it;
+	for (it = _nicknameMap.begin(); it !=_nicknameMap.end(); ++it) {
+		if (!names.empty())
+			names += " ";
+		if (this->isOperator(it->first))
+            names += "@";
+		names += it->first;
+	}
+	return names;
 }
