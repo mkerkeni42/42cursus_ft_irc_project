@@ -125,7 +125,6 @@ void	Channel::deleteMode(char mode) {
 std::string	Channel::getModes(void) const { return (std::string(_modes.begin(), _modes.end())); }
 
 void	Channel::broadcastMessageOnChannel(const std::string& message, User *sender, int x) {
-	(void)sender;
 	for (std::vector<User*>::iterator	it = _users.begin(); it != _users.end(); ++it) {
 		User*	user = *it;
 		if (user->getNickname() != sender->getNickname() && !user->isNotified()) {
