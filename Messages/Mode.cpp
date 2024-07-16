@@ -112,7 +112,7 @@ int	MessageServ::handleSetMode(Channel *channel, char const & mode, std::istring
 			if (limit.empty())
 				throw NeedMoreParamsException(user->getNickname(), "MODE");
 			for (size_t i = 0; i < limit.length(); i++) {
-				if (limit.length() > 100 || !std::isdigit(limit[i])) {
+				if (limit.length() > 9 || !std::isdigit(limit[i])) {
 					return 1;
 				}
 			}
